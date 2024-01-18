@@ -59,7 +59,7 @@ public class ChessBoard {
      */
     public void resetBoard() {
         // declare black pieces
-        ChessPiece[][] board = new ChessPiece[8][8];
+        board = new ChessPiece[8][8];
         board[0][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
         board[0][1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         board[0][2] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
