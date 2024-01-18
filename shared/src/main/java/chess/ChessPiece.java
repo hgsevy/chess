@@ -13,8 +13,8 @@ import java.util.Objects;
 public class ChessPiece {
 
     //private variables
-    private ChessGame.TeamColor color;
-    private ChessPiece.PieceType type;
+    private final ChessGame.TeamColor color;
+    private final ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         color = pieceColor;
@@ -47,7 +47,7 @@ public class ChessPiece {
         return type;
     }
 
-    /** TODO
+    /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
      * danger
@@ -181,7 +181,7 @@ public class ChessPiece {
                     else{i = 9;}
                 }
                 break;
-            case KNIGHT:
+            case KNIGHT:// TODO
                 // check one at a time like king??
                 throw new RuntimeException("Not implemented");
             case ROOK:
