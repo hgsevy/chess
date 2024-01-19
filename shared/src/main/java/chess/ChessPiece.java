@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -295,5 +296,21 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(color, type);
+    }
+
+    public String toString() {
+        String str = "";
+        switch(type){
+            case KING -> str = "k";
+            case QUEEN -> str = "q";
+            case BISHOP -> str = "b";
+            case KNIGHT -> str = "n";
+            case ROOK -> str = "r";
+            case PAWN -> str = "p";
+        }
+        if (color == ChessGame.TeamColor.WHITE){
+            str = str.toUpperCase();
+        }
+        return str;
     }
 }
