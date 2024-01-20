@@ -11,9 +11,9 @@ import java.util.Objects;
 public class ChessMove {
 
     // instance variables
-    private ChessPosition start;
-    private ChessPosition end;
-    private ChessPiece.PieceType promotion;
+    private final ChessPosition start;
+    private final ChessPosition end;
+    private final ChessPiece.PieceType promotion;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
