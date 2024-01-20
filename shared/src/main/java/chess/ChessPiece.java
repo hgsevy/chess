@@ -104,6 +104,9 @@ public class ChessPiece {
                 while (i >= 1){
                     if (board.isOpenForPiece(new ChessPosition(row, i), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
+                        if (board.getPiece(new ChessPosition(row,i)) != null){
+                            i = 0;
+                        } // breaks out of while loop
                         i--;
                     }
                     else {i = 0;} // breaks out of while loop
@@ -113,6 +116,9 @@ public class ChessPiece {
                 while (i <= 8){
                     if (board.isOpenForPiece(new ChessPosition(row, i), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
+                        if (board.getPiece(new ChessPosition(row,i)) != null){
+                            i = 9;
+                        } // breaks out of while loop
                         i++;
                     }
                     else {i = 9;} // breaks out of while loop
@@ -122,6 +128,9 @@ public class ChessPiece {
                 while (i >= 1){
                     if (board.isOpenForPiece(new ChessPosition(i, col), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
+                        if (board.getPiece(new ChessPosition(i,col)) != null){
+                            i = 0;
+                        } // breaks out of while loop
                         i--;
                     }
                     else {i = 0;} // breaks out of while loop
@@ -131,6 +140,9 @@ public class ChessPiece {
                 while (i <= 8){
                     if (board.isOpenForPiece(new ChessPosition(i, col), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
+                        if (board.getPiece(new ChessPosition(i, col)) != null){
+                            i = 8;
+                        } // breaks out of while loop
                         i++;
                     }
                     else {i = 8;} // breaks out of while loop
@@ -143,6 +155,9 @@ public class ChessPiece {
                 while (i >= 1 && j >= 1){
                     if (board.isOpenForPiece(new ChessPosition(i, j), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
+                        if (board.getPiece(new ChessPosition(i,j)) != null){
+                            i = 0;
+                        } // breaks out of while loop
                         i--;
                         j--;
                     }
@@ -154,6 +169,9 @@ public class ChessPiece {
                 while (i >= 1 && j <= 8){
                     if (board.isOpenForPiece(new ChessPosition(i, j), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
+                        if (board.getPiece(new ChessPosition(i,j)) != null){
+                            i = 0;
+                        } // breaks out of while loop
                         i--;
                         j++;
                     }
@@ -165,6 +183,9 @@ public class ChessPiece {
                 while (i <= 8 && j >= 1){
                     if (board.isOpenForPiece(new ChessPosition(i, j), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
+                        if (board.getPiece(new ChessPosition(i,j)) != null){
+                            i = 9;
+                        } // breaks out of while loop
                         i++;
                         j--;
                     }
@@ -176,6 +197,9 @@ public class ChessPiece {
                 while (i <= 8 && j <= 8){
                     if (board.isOpenForPiece(new ChessPosition(i, j), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
+                        if (board.getPiece(new ChessPosition(i,j)) != null){
+                            i = 9;
+                        } // breaks out of while loop
                         i++;
                         j++;
                     }
@@ -201,6 +225,9 @@ public class ChessPiece {
                 while (i <= 8){
                     if (board.isOpenForPiece(new ChessPosition(row, i), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
+                        if (board.getPiece(new ChessPosition(row,i)) != null){
+                            i = 9;
+                        } // breaks out of while loop
                         i++;
                     }
                     else {i = 9;} // breaks out of while loop
@@ -210,6 +237,9 @@ public class ChessPiece {
                 while (i >= 1){
                     if (board.isOpenForPiece(new ChessPosition(i, col), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
+                        if (board.getPiece(new ChessPosition(i,col)) != null){
+                            i = 0;
+                        } // breaks out of while loop
                         i--;
                     }
                     else {i = 0;} // breaks out of while loop
@@ -219,9 +249,12 @@ public class ChessPiece {
                 while (i <= 8){
                     if (board.isOpenForPiece(new ChessPosition(i, col), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
+                        if (board.getPiece(new ChessPosition(i,col)) != null){
+                            i = 9;
+                        } // breaks out of while loop
                         i++;
                     }
-                    else {i = 8;} // breaks out of while loop
+                    else {i = 9;} // breaks out of while loop
                 }
 
                 break;
