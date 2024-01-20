@@ -136,7 +136,7 @@ public class ChessPiece {
                     else {i = 0;} // breaks out of while loop
                 }
                 // check col down
-                i = col+1;
+                i = row+1;
                 while (i <= 8){
                     if (board.isOpenForPiece(new ChessPosition(i, col), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
@@ -145,7 +145,7 @@ public class ChessPiece {
                         } // breaks out of while loop
                         i++;
                     }
-                    else {i = 8;} // breaks out of while loop
+                    else {i = 9;} // breaks out of while loop
                 }
                 // check diagonals by not breaking before Bishop case
             case BISHOP:
@@ -243,11 +243,13 @@ public class ChessPiece {
                 break;
             case ROOK:
                 // check row left
-                // check row left
-                i = col - 1;
+                i = col-1;
                 while (i >= 1){
                     if (board.isOpenForPiece(new ChessPosition(row, i), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
+                        if (board.getPiece(new ChessPosition(row,i)) != null){
+                            i = 0;
+                        } // breaks out of while loop
                         i--;
                     }
                     else {i = 0;} // breaks out of while loop
@@ -277,18 +279,17 @@ public class ChessPiece {
                     else {i = 0;} // breaks out of while loop
                 }
                 // check col down
-                i = col + 1;
+                i = row+1;
                 while (i <= 8){
                     if (board.isOpenForPiece(new ChessPosition(i, col), color)){
                         answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                        if (board.getPiece(new ChessPosition(i,col)) != null){
-                            i = 9;
+                        if (board.getPiece(new ChessPosition(i, col)) != null){
+                            i = 8;
                         } // breaks out of while loop
                         i++;
                     }
                     else {i = 9;} // breaks out of while loop
                 }
-
                 break;
 
             case PAWN:
@@ -317,13 +318,13 @@ public class ChessPiece {
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col), PieceType.KNIGHT));
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col), PieceType.ROOK));
                     }
-                    if (col > 1 && board.getPiece(new ChessPosition(finalRow, col - 1)).color == attackColor) { // attack left
+                    if (col > 1 && board.getPiece(new ChessPosition(finalRow, col - 1)) != null && board.getPiece(new ChessPosition(finalRow, col - 1)).color == attackColor) { // attack left
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col - 1), PieceType.QUEEN));
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col - 1), PieceType.BISHOP));
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col - 1), PieceType.KNIGHT));
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col - 1), PieceType.ROOK));
                     }
-                    if (col < 8 && board.getPiece(new ChessPosition(finalRow, col + 1)).color == attackColor) { // attack right
+                    if (col < 8 && board.getPiece(new ChessPosition(finalRow, col + 1)) != null && board.getPiece(new ChessPosition(finalRow, col + 1)).color == attackColor) { // attack right
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col + 1), PieceType.QUEEN));
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col + 1), PieceType.BISHOP));
                         answer.add(new ChessMove(myPosition, new ChessPosition(finalRow, col + 1), PieceType.KNIGHT));
@@ -337,10 +338,10 @@ public class ChessPiece {
                             answer.add(new ChessMove(myPosition, new ChessPosition(row+2*direction, col), null));
                         }
                     }
-                    if (col > 1 && board.getPiece(new ChessPosition(row+direction, col - 1)).color == attackColor) { // attack left
+                    if (col > 1 && board.getPiece(new ChessPosition(row+direction, col - 1)) != null && board.getPiece(new ChessPosition(row+direction, col - 1)).color == attackColor) { // attack left
                         answer.add(new ChessMove(myPosition, new ChessPosition(row+direction, col - 1), null));
                     }
-                    if (col < 8 && board.getPiece(new ChessPosition(row+direction, col + 1)).color == attackColor) { // attack left
+                    if (col < 8 && board.getPiece(new ChessPosition(row+direction, col + 1)) != null && board.getPiece(new ChessPosition(row+direction, col + 1)).color == attackColor) { // attack left
                         answer.add(new ChessMove(myPosition, new ChessPosition(row - 1, col + 1), null));
                     }
                 }
