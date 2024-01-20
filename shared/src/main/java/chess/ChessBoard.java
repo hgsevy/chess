@@ -107,18 +107,18 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (int i = 7; i >= 0; i--){
             for (int j = 0; j < 8; j++){
-                str += "|";
+                str.append("|");
                 if (board[i][j] == null){
-                    str += " ";
+                    str.append(" ");
                 } else {
-                    str += board[i][j].toString();
+                    str.append(board[i][j].toString());
                 }
             }
-            str += "|\n";
+            str.append("|\n");
         }
-        return str;
+        return str.toString();
     }
 }
