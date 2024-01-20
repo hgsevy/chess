@@ -207,8 +207,40 @@ public class ChessPiece {
                 }
                 break;
             case KNIGHT:// TODO
-                // check one at a time like king??
-                throw new RuntimeException("Not implemented");
+                // check one at a time like king
+                // 2 up 1 left
+                if (row > 2 && col > 1 && board.isOpenForPiece(new ChessPosition(row-2, col-1), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row-2, col-1), null));
+                }
+                // 2 up 1 right
+                if (row > 2 && col < 8 && board.isOpenForPiece(new ChessPosition(row-2, col+1), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row-2, col+1), null));
+                }
+                // 2 right 1 up
+                if (row > 1 && col < 7 && board.isOpenForPiece(new ChessPosition(row-1, col+2), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row-1, col+2), null));
+                }
+                // 2 right 1 down
+                if (row < 8 && col < 7 && board.isOpenForPiece(new ChessPosition(row+1, col+2), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row+1, col+2), null));
+                }
+                // 2 left 1 up
+                if (row > 1 && col > 2 && board.isOpenForPiece(new ChessPosition(row-1, col-2), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row-1, col-2), null));
+                }
+                // 2 left 1 down
+                if (row < 8 && col > 2 && board.isOpenForPiece(new ChessPosition(row+1, col-2), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row+1, col-2), null));
+                }
+                // 2 down 1 left
+                if (row < 7 && col > 1 && board.isOpenForPiece(new ChessPosition(row+2, col-1), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row+2, col-1), null));
+                }
+                // 2 down 1 right
+                if (row < 7 && col < 8 && board.isOpenForPiece(new ChessPosition(row+2, col+1), color)) { // can move left
+                    answer.add(new ChessMove(myPosition, new ChessPosition(row+2, col+1), null));
+                }
+                break;
             case ROOK:
                 // check row left
                 // check row left
