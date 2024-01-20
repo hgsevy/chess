@@ -100,53 +100,7 @@ public class ChessPiece {
                 break;
             case QUEEN:
                 // check row left
-                i = col-1;
-                while (i >= 1){
-                    if (board.isOpenForPiece(new ChessPosition(row, i), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
-                        if (board.getPiece(new ChessPosition(row,i)) != null){
-                            i = 0;
-                        } // breaks out of while loop
-                        i--;
-                    }
-                    else {i = 0;} // breaks out of while loop
-                }
-                // check row right
-                i = col+1;
-                while (i <= 8){
-                    if (board.isOpenForPiece(new ChessPosition(row, i), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
-                        if (board.getPiece(new ChessPosition(row,i)) != null){
-                            i = 9;
-                        } // breaks out of while loop
-                        i++;
-                    }
-                    else {i = 9;} // breaks out of while loop
-                }
-                // check col up
-                i = row - 1;
-                while (i >= 1){
-                    if (board.isOpenForPiece(new ChessPosition(i, col), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                        if (board.getPiece(new ChessPosition(i,col)) != null){
-                            i = 0;
-                        } // breaks out of while loop
-                        i--;
-                    }
-                    else {i = 0;} // breaks out of while loop
-                }
-                // check col down
-                i = row+1;
-                while (i <= 8){
-                    if (board.isOpenForPiece(new ChessPosition(i, col), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                        if (board.getPiece(new ChessPosition(i, col)) != null){
-                            i = 8;
-                        } // breaks out of while loop
-                        i++;
-                    }
-                    else {i = 9;} // breaks out of while loop
-                }
+                answer.addAll(checkSquareMoves(board, myPosition));
                 // check diagonals by not breaking before Bishop case
             case BISHOP:
                 // check up-left diagonal
@@ -206,7 +160,7 @@ public class ChessPiece {
                     else{i = 9;}
                 }
                 break;
-            case KNIGHT:// TODO
+            case KNIGHT:
                 // check one at a time like king
                 // 2 up 1 left
                 if (row > 2 && col > 1 && board.isOpenForPiece(new ChessPosition(row-2, col-1), color)) { // can move left
@@ -242,54 +196,7 @@ public class ChessPiece {
                 }
                 break;
             case ROOK:
-                // check row left
-                i = col-1;
-                while (i >= 1){
-                    if (board.isOpenForPiece(new ChessPosition(row, i), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
-                        if (board.getPiece(new ChessPosition(row,i)) != null){
-                            i = 0;
-                        } // breaks out of while loop
-                        i--;
-                    }
-                    else {i = 0;} // breaks out of while loop
-                }
-                // check row right
-                i = col+1;
-                while (i <= 8){
-                    if (board.isOpenForPiece(new ChessPosition(row, i), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
-                        if (board.getPiece(new ChessPosition(row,i)) != null){
-                            i = 9;
-                        } // breaks out of while loop
-                        i++;
-                    }
-                    else {i = 9;} // breaks out of while loop
-                }
-                // check col up
-                i = row - 1;
-                while (i >= 1){
-                    if (board.isOpenForPiece(new ChessPosition(i, col), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                        if (board.getPiece(new ChessPosition(i,col)) != null){
-                            i = 0;
-                        } // breaks out of while loop
-                        i--;
-                    }
-                    else {i = 0;} // breaks out of while loop
-                }
-                // check col down
-                i = row+1;
-                while (i <= 8){
-                    if (board.isOpenForPiece(new ChessPosition(i, col), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                        if (board.getPiece(new ChessPosition(i, col)) != null){
-                            i = 8;
-                        } // breaks out of while loop
-                        i++;
-                    }
-                    else {i = 9;} // breaks out of while loop
-                }
+                answer.addAll(checkSquareMoves(board, myPosition));
                 break;
 
             case PAWN:
@@ -349,6 +256,63 @@ public class ChessPiece {
         }
         return answer;
 
+    }
+
+    /**functions to clean up Queen code (because just combination of Bishop and Rook)**/
+    private Collection<ChessMove> checkSquareMoves(ChessBoard board, ChessPosition myPosition){
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        Collection<ChessMove> answer = new ArrayList<>();
+
+        int i = col-1;
+        while (i >= 1){
+            if (board.isOpenForPiece(new ChessPosition(row, i), color)){
+                answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
+                if (board.getPiece(new ChessPosition(row,i)) != null){
+                    i = 0;
+                } // breaks out of while loop
+                i--;
+            }
+            else {i = 0;} // breaks out of while loop
+        }
+        // check row right
+        i = col+1;
+        while (i <= 8){
+            if (board.isOpenForPiece(new ChessPosition(row, i), color)){
+                answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
+                if (board.getPiece(new ChessPosition(row,i)) != null){
+                    i = 9;
+                } // breaks out of while loop
+                i++;
+            }
+            else {i = 9;} // breaks out of while loop
+        }
+        // check col up
+        i = row - 1;
+        while (i >= 1){
+            if (board.isOpenForPiece(new ChessPosition(i, col), color)){
+                answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
+                if (board.getPiece(new ChessPosition(i,col)) != null){
+                    i = 0;
+                } // breaks out of while loop
+                i--;
+            }
+            else {i = 0;} // breaks out of while loop
+        }
+        // check col down
+        i = row+1;
+        while (i <= 8){
+            if (board.isOpenForPiece(new ChessPosition(i, col), color)){
+                answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
+                if (board.getPiece(new ChessPosition(i, col)) != null){
+                    i = 8;
+                } // breaks out of while loop
+                i++;
+            }
+            else {i = 9;} // breaks out of while loop
+        }
+        return answer;
     }
 
     @Override
