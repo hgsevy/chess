@@ -56,8 +56,8 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
+        int row = myPosition.row();
+        int col = myPosition.col();
 
         int i; // error codes about redeclaration in switch are freaking me out, so doing this way
         int j;
@@ -260,8 +260,8 @@ public class ChessPiece {
 
     /**functions to clean up Queen code (because just combination of Bishop and Rook)**/
     private Collection<ChessMove> checkSquareMoves(ChessBoard board, ChessPosition myPosition){
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
+        int row = myPosition.row();
+        int col = myPosition.col();
 
         Collection<ChessMove> answer = new ArrayList<>();
 

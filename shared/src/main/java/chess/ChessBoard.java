@@ -29,8 +29,8 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
 
-        int i = position.getRow() - 1;
-        int j = position.getColumn() - 1;
+        int i = position.row() - 1;
+        int j = position.col() - 1;
 
         board[i][j] = piece;
     }
@@ -43,7 +43,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow() - 1][position.getColumn() - 1];
+        return board[position.row() - 1][position.col() - 1];
     }
 
     /**
@@ -54,7 +54,7 @@ public class ChessBoard {
      * by that color
      */
     public boolean isOpenForPiece(ChessPosition position, ChessGame.TeamColor color) {
-        return board[position.getRow()-1][position.getColumn()-1] == null || board[position.getRow()-1][position.getColumn()-1].getTeamColor() != color;
+        return board[position.row()-1][position.col()-1] == null || board[position.row()-1][position.col()-1].getTeamColor() != color;
     }
 
     /**
