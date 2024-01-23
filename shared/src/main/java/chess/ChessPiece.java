@@ -59,9 +59,6 @@ public class ChessPiece {
         int row = myPosition.row();
         int col = myPosition.col();
 
-        int i; // error codes about redeclaration in switch are freaking me out, so doing this way
-        int j;
-
         Collection<ChessMove> answer = new ArrayList<>();
 
         switch (type){
@@ -103,62 +100,7 @@ public class ChessPiece {
                 answer.addAll(checkSquareMoves(board, myPosition));
                 // check diagonals by not breaking before Bishop case
             case BISHOP:
-                // check up-left diagonal
-                i = row - 1;
-                j = col - 1;
-                while (i >= 1 && j >= 1){
-                    if (board.isOpenForPiece(new ChessPosition(i, j), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
-                        if (board.getPiece(new ChessPosition(i,j)) != null){
-                            i = 0;
-                        } // breaks out of while loop
-                        i--;
-                        j--;
-                    }
-                    else{i = 0;}
-                }
-                // check up-right diagonal
-                i = row - 1;
-                j = col + 1;
-                while (i >= 1 && j <= 8){
-                    if (board.isOpenForPiece(new ChessPosition(i, j), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
-                        if (board.getPiece(new ChessPosition(i,j)) != null){
-                            i = 0;
-                        } // breaks out of while loop
-                        i--;
-                        j++;
-                    }
-                    else{i = 0;}
-                }
-                // check down-left diagonal
-                i = row + 1;
-                j = col - 1;
-                while (i <= 8 && j >= 1){
-                    if (board.isOpenForPiece(new ChessPosition(i, j), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
-                        if (board.getPiece(new ChessPosition(i,j)) != null){
-                            i = 9;
-                        } // breaks out of while loop
-                        i++;
-                        j--;
-                    }
-                    else{i = 9;}
-                }
-                // check down-right diagonal
-                i = row + 1;
-                j = col + 1;
-                while (i <= 8 && j <= 8){
-                    if (board.isOpenForPiece(new ChessPosition(i, j), color)){
-                        answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
-                        if (board.getPiece(new ChessPosition(i,j)) != null){
-                            i = 9;
-                        } // breaks out of while loop
-                        i++;
-                        j++;
-                    }
-                    else{i = 9;}
-                }
+                answer.addAll(checkDiagonalMoves(board, myPosition));
                 break;
             case KNIGHT:
                 // check one at a time like king
@@ -260,57 +202,57 @@ public class ChessPiece {
 
     /**functions to clean up Queen code (because just combination of Bishop and Rook)**/
     private Collection<ChessMove> checkSquareMoves(ChessBoard board, ChessPosition myPosition){
-        int row = myPosition.row();
-        int col = myPosition.col();
+        Collection<ChessMove> answer = new ArrayList<>();
+
+        //check row left
+        answer.addAll(checkLine(board, myPosition, 0, -1));
+        //check row right
+        answer.addAll(checkLine(board, myPosition, 0, 1));
+        //check column up
+        answer.addAll(checkLine(board, myPosition, -1, 0));
+        //check column down
+        answer.addAll(checkLine(board, myPosition, 1, 0));
+
+        return answer;
+    }
+
+    private Collection<ChessMove> checkDiagonalMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> answer = new ArrayList<>();
+
+        //check up left
+        answer.addAll(checkLine(board, myPosition, -1, -1));
+        //check up right
+        answer.addAll(checkLine(board, myPosition, -1, 1));
+        //check down left
+        answer.addAll(checkLine(board, myPosition, 1, -1));
+        //check down right
+        answer.addAll(checkLine(board, myPosition, 1, 1));
+
+        return answer;
+    }
+
+    /**
+    * Function to check to possible moves along a line
+     * @param rowDirection if moving up = 1, if moving down = -1, if constant = 0
+     * @param colDirection same as rowDirection, but for columns/left and right
+    * */
+    private Collection<ChessMove> checkLine(ChessBoard board, ChessPosition myPosition, int rowDirection, int colDirection){
+        int i = myPosition.row() + rowDirection;
+        int j = myPosition.col() + colDirection;
 
         Collection<ChessMove> answer = new ArrayList<>();
 
-        int i = col-1;
-        while (i >= 1){
-            if (board.isOpenForPiece(new ChessPosition(row, i), color)){
-                answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
-                if (board.getPiece(new ChessPosition(row,i)) != null){
-                    i = 0;
+        while (i >= 1 && i <= 8 && j >= 1 && j <= 8){
+            if (board.isOpenForPiece(new ChessPosition(i, j), color)){
+                answer.add(new ChessMove(myPosition, new ChessPosition(i, j), null));
+                if (board.getPiece(new ChessPosition(i, j)) != null){
+                    //i = 10; // is this needed??
+                    break;
                 } // breaks out of while loop
-                i--;
+                i += rowDirection;
+                j += colDirection;
             }
-            else {i = 0;} // breaks out of while loop
-        }
-        // check row right
-        i = col+1;
-        while (i <= 8){
-            if (board.isOpenForPiece(new ChessPosition(row, i), color)){
-                answer.add(new ChessMove(myPosition, new ChessPosition(row, i), null));
-                if (board.getPiece(new ChessPosition(row,i)) != null){
-                    i = 9;
-                } // breaks out of while loop
-                i++;
-            }
-            else {i = 9;} // breaks out of while loop
-        }
-        // check col up
-        i = row - 1;
-        while (i >= 1){
-            if (board.isOpenForPiece(new ChessPosition(i, col), color)){
-                answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                if (board.getPiece(new ChessPosition(i,col)) != null){
-                    i = 0;
-                } // breaks out of while loop
-                i--;
-            }
-            else {i = 0;} // breaks out of while loop
-        }
-        // check col down
-        i = row+1;
-        while (i <= 8){
-            if (board.isOpenForPiece(new ChessPosition(i, col), color)){
-                answer.add(new ChessMove(myPosition, new ChessPosition(i, col), null));
-                if (board.getPiece(new ChessPosition(i, col)) != null){
-                    i = 8;
-                } // breaks out of while loop
-                i++;
-            }
-            else {i = 9;} // breaks out of while loop
+            else {break;}
         }
         return answer;
     }
