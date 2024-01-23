@@ -28,11 +28,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-
-        int i = position.row() - 1;
-        int j = position.col() - 1;
-
-        board[i][j] = piece;
+        board[position.row()-1][position.col()-1] = piece;
     }
 
     /**

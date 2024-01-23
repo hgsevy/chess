@@ -1,6 +1,6 @@
 package chess;
 
-import java.util.Objects;
+//import java.util.Objects;
 
 /**
  * Represents a single square position on a chess board
