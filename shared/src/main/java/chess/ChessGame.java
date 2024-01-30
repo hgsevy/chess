@@ -118,7 +118,7 @@ public class ChessGame {
         }
         else {opposing = TeamColor.BLACK;}
 
-        Collection<ChessMove> opposingMoves = allTeamMoves(opposing);
+        Collection<ChessMove> opposingMoves = allOtherTeamMoves(opposing);
         ChessPosition kingPosition = getKingPosition(teamColor);
         for (ChessMove move : opposingMoves){
             if (move.end().equals(kingPosition)){
@@ -128,12 +128,25 @@ public class ChessGame {
         return false;
     }
 
-    private Collection<ChessMove> allTeamMoves(TeamColor teamColor){
+    private Collection<ChessMove> allOtherTeamMoves(TeamColor teamColor){
         Collection<ChessMove> allTheMoves = new ArrayList<>();
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
                 if (board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
                     Collection<ChessMove> someMoves = board.getPiece(new ChessPosition(i,j)).pieceMoves(board, new ChessPosition(i,j));
+                    allTheMoves.addAll(someMoves);
+                }
+            }
+        }
+        return allTheMoves;
+    }
+
+    private Collection<ChessMove> allValidTeamMoves(TeamColor teamColor){
+        Collection<ChessMove> allTheMoves = new ArrayList<>();
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                if (board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    Collection<ChessMove> someMoves = validMoves(new ChessPosition(i, j));
                     allTheMoves.addAll(someMoves);
                 }
             }
@@ -153,7 +166,7 @@ public class ChessGame {
         return null;
     }
 
-    /** TODO
+    /**
      * Determines if the given team is in checkmate
      *
      * @param teamColor which team to check for checkmate
@@ -165,11 +178,11 @@ public class ChessGame {
             return false;
         }
         */
-        Collection<ChessMove> moves = allTeamMoves(teamColor);
+        Collection<ChessMove> moves = allValidTeamMoves(teamColor);
         return moves.isEmpty();
     }
 
-    /** TODO
+    /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves
      *
@@ -177,7 +190,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return isInCheckmate(TeamColor.BLACK) && isInCheckmate(TeamColor.WHITE);
+        return isInCheckmate(teamColor) && turn == teamColor;
     }
 
     /**
