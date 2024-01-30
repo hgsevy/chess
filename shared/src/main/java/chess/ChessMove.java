@@ -9,5 +9,8 @@ package chess;
  * signature of the existing methods.
  */
 
-public record ChessMove(ChessPosition start, ChessPosition end, ChessPiece.PieceType promotion){}
+public record ChessMove(ChessPosition start, ChessPosition end, ChessPiece.PieceType promotion){
+    public ChessPosition getStartPosition(){return start;}
+    public ChessPosition getEndPosition(){return end;}
+}
 
