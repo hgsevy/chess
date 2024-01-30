@@ -197,7 +197,7 @@ public class ChessPiece {
                         answer.add(new ChessMove(myPosition, new ChessPosition(row+direction, col - 1), null));
                     }
                     if (col < 8 && board.getPiece(new ChessPosition(row+direction, col + 1)) != null && board.getPiece(new ChessPosition(row+direction, col + 1)).color == attackColor) { // attack left
-                        answer.add(new ChessMove(myPosition, new ChessPosition(row - 1, col + 1), null));
+                        answer.add(new ChessMove(myPosition, new ChessPosition(row+direction, col + 1), null));
                     }
                 }
                 break;
