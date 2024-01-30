@@ -9,8 +9,6 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 
-// TODO: add equals override
-
 public class ChessBoard {
 
     // private variable

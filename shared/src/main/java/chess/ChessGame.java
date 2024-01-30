@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.util.Collections.addAll;
+//import static java.util.Collections.addAll;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -42,6 +42,12 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         turn = team;
+    }
+
+    private void switchTeamTurn(){
+        if (turn == TeamColor.BLACK){
+            turn = TeamColor.WHITE;
+        } else {turn = TeamColor.BLACK;}
     }
 
     /**
@@ -87,10 +93,14 @@ public class ChessGame {
         if (board.getPiece(move.start()) == null){
             throw new InvalidMoveException();
         }
+        if (board.getPiece(move.start()).getTeamColor() != turn){
+            throw new InvalidMoveException();
+        }
         Collection<ChessMove> possibilities = validMoves(move.start());
         for (ChessMove possibleMove : possibilities){
             if (possibleMove.equals(move)){
                 makeMoveToCheckMove(move);
+                switchTeamTurn();
                 return;
             }
         }
@@ -98,7 +108,11 @@ public class ChessGame {
     }
 
     private void makeMoveToCheckMove(ChessMove move) {
-        board.addPiece(move.end(), board.getPiece(move.start()));
+        if (move.promotion() != null){
+            board.addPiece(move.end(), new ChessPiece(board.getPiece(move.start()).getTeamColor(), move.promotion()));
+        } else {
+            board.addPiece(move.end(), board.getPiece(move.start()));
+        }
         board.addPiece(move.start(), null);
     }
 
