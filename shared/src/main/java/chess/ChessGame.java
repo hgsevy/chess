@@ -16,16 +16,35 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor turn;
+    private boolean whiteKingMoved;
+    private boolean whiteLeftRookMoved;
+    private boolean whiteRightRookMoved;
+    private boolean blackKingMoved;
+    private boolean blackLeftRookMoved;
+    private boolean blackRightRookMoved;
+
 
     public ChessGame() {
         board = new ChessBoard();
         turn = TeamColor.WHITE;
+        whiteKingMoved = false;
+        whiteLeftRookMoved = false;
+        whiteRightRookMoved = false;
+        blackKingMoved = false;
+        blackLeftRookMoved = false;
+        blackRightRookMoved = false;
     }
 
     // copy constructor
     public ChessGame(ChessGame original) {
         board = new ChessBoard(original.board);
         turn = original.turn;
+        whiteKingMoved = original.whiteKingMoved;
+        whiteLeftRookMoved = original.whiteLeftRookMoved;
+        whiteRightRookMoved = original.whiteRightRookMoved;
+        blackKingMoved = original.blackKingMoved;
+        blackLeftRookMoved = original.blackLeftRookMoved;
+        blackRightRookMoved = original.blackRightRookMoved;
     }
 
     /**
@@ -80,7 +99,126 @@ public class ChessGame {
             }
 
         }
+        moves.addAll(checkCastleMove(startPosition));
         return moves;
+    }
+
+    private Collection<ChessMove> checkCastleMove(ChessPosition position){
+        Collection<ChessMove> moves = new ArrayList<>();
+        boolean validMove;
+        if (position.equals(new ChessPosition(8, 5)) && !blackKingMoved){
+            if (!blackLeftRookMoved){
+                // check that all spaces between are blank
+                validMove = true;
+                for (int i = 2; i < 5; i++){
+                    if (board.getPiece(new ChessPosition(8, i)) != null){
+                        validMove = false;
+                    }
+                }
+                if (validMove) {
+                    // check to make sure no one is in check
+                    ChessGame trialGame = new ChessGame(this);
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null));
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 1), new ChessPosition(8, 4), null));
+                    if (!trialGame.isInCheck(TeamColor.BLACK)){
+                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.WHITE);
+                        for(ChessMove move : opposingMoves){
+                            if (move.end().equals(new ChessPosition(8,3))){
+                                validMove = false;
+                            }
+                        }
+                        if (validMove){
+                            moves.add(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null));
+                        }
+                    }
+
+                }
+            }
+            if (!blackRightRookMoved){
+                // check to make sure no one is in check
+                validMove = true;
+                for (int i = 6; i < 7; i++){
+                    if (board.getPiece(new ChessPosition(8, i)) != null){
+                        validMove = false;
+                    }
+                }
+                if (validMove) {
+                    // check to make sure no one is in check
+                    ChessGame trialGame = new ChessGame(this);
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null));
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 8), new ChessPosition(8, 6), null));
+                    if (!trialGame.isInCheck(TeamColor.BLACK)){
+                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.WHITE);
+                        for(ChessMove move : opposingMoves){
+                            if (move.end().equals(new ChessPosition(8,6))){
+                                validMove = false;
+                            }
+                        }
+                        if (validMove){
+                            moves.add(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null));
+                        }
+                    }
+
+                }
+            }
+        } else if (position.equals(new ChessPosition(1, 5)) && !whiteKingMoved){
+            if (!whiteLeftRookMoved){
+                // check that all spaces between are blank
+                validMove = true;
+                for (int i = 2; i < 5; i++){
+                    if (board.getPiece(new ChessPosition(1, i)) != null){
+                        validMove = false;
+                    }
+                }
+                if (validMove) {
+                    // check to make sure no one is in check
+                    ChessGame trialGame = new ChessGame(this);
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null));
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 1), new ChessPosition(1, 4), null));
+                    if (!trialGame.isInCheck(TeamColor.WHITE)){
+                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.BLACK);
+                        for(ChessMove move : opposingMoves){
+                            if (move.end().equals(new ChessPosition(1,3))){
+                                validMove = false;
+                            }
+                        }
+                        if (validMove){
+                            moves.add(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null));
+                        }
+                    }
+
+                }
+            }
+            if (!whiteRightRookMoved){
+                // check to make sure no one is in check
+                validMove = true;
+                for (int i = 6; i <= 7; i++){
+                    if (board.getPiece(new ChessPosition(1, i)) != null){
+                        validMove = false;
+                    }
+                }
+                if (validMove) {
+                    // check to make sure no one is in check
+                    ChessGame trialGame = new ChessGame(this);
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null));
+                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 8), new ChessPosition(1, 6), null));
+                    if (!trialGame.isInCheck(TeamColor.WHITE)){
+                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.BLACK);
+                        for(ChessMove move : opposingMoves){
+                            if (move.end().equals(new ChessPosition(1,6))){
+                                validMove = false;
+                            }
+                        }
+                        if (validMove){
+                            moves.add(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null));
+                        }
+                    }
+
+                }
+            }
+        }
+        return moves;
+
     }
 
     /**
@@ -99,12 +237,80 @@ public class ChessGame {
         Collection<ChessMove> possibilities = validMoves(move.start());
         for (ChessMove possibleMove : possibilities){
             if (possibleMove.equals(move)){
-                makeMoveToCheckMove(move);
+                if (board.getPiece(move.start()).getPieceType() == ChessPiece.PieceType.KING && (move.start().col() - move.end().col() == 2) || move.start().col() - move.end().col() == -2){
+                    makeCastleMove(move);
+                } else {
+                    updateBools(board.getPiece(move.start()), move.start());
+                    makeMoveToCheckMove(move);
+                }
                 switchTeamTurn();
                 return;
             }
         }
         throw new InvalidMoveException();
+    }
+
+    private void updateBools(ChessPiece piece, ChessPosition start){
+        if (start.row() == 8 && piece.getTeamColor() == TeamColor.BLACK){
+            if (piece.getPieceType() == ChessPiece.PieceType.KING){
+                blackKingMoved = true;
+            }
+            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK){
+                if (start.col() == 1) {
+                    blackLeftRookMoved = true;
+                }
+                else if (start.col() == 8){
+                    blackRightRookMoved = true;
+                }
+            }
+        }
+        else if (start.row() == 1 && piece.getTeamColor() == TeamColor.WHITE){
+            if (piece.getPieceType() == ChessPiece.PieceType.KING){
+                whiteKingMoved = true;
+            }
+            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK){
+                if (start.col() == 1) {
+                    whiteLeftRookMoved = true;
+                }
+                else if (start.col() == 8){
+                    whiteRightRookMoved = true;
+                }
+            }
+        }
+    }
+
+    private void makeCastleMove(ChessMove move){
+        if(move.start().row() == 8){
+            if (move.end().col() == 3){
+                board.addPiece(move.end(), board.getPiece(move.start()));
+                board.addPiece(new ChessPosition(8, 4), board.getPiece(new ChessPosition(8,1)));
+                board.addPiece(move.start(), null);
+                board.addPiece(new ChessPosition(8,1), null);
+                blackLeftRookMoved = true;
+            } else {
+                board.addPiece(move.end(), board.getPiece(move.start()));
+                board.addPiece(new ChessPosition(8, 6), board.getPiece(new ChessPosition(8,8)));
+                board.addPiece(move.start(), null);
+                board.addPiece(new ChessPosition(8,8), null);
+                blackRightRookMoved = true;
+            }
+            blackKingMoved = true;
+        } else {
+            if (move.end().col() == 3){
+                board.addPiece(move.end(), board.getPiece(move.start()));
+                board.addPiece(new ChessPosition(1, 4), board.getPiece(new ChessPosition(1,1)));
+                board.addPiece(move.start(), null);
+                board.addPiece(new ChessPosition(1,1), null);
+                whiteLeftRookMoved = true;
+            } else {
+                board.addPiece(move.end(), board.getPiece(move.start()));
+                board.addPiece(new ChessPosition(1, 6), board.getPiece(new ChessPosition(1,8)));
+                board.addPiece(move.start(), null);
+                board.addPiece(new ChessPosition(1,8), null);
+                whiteRightRookMoved = true;
+            }
+            whiteKingMoved = true;
+        }
     }
 
     private void makeMoveToCheckMove(ChessMove move) {
@@ -210,6 +416,13 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+
+        whiteKingMoved = false;
+        whiteLeftRookMoved = false;
+        whiteRightRookMoved = false;
+        blackKingMoved = false;
+        blackLeftRookMoved = false;
+        blackRightRookMoved = false;
     }
 
     /**
