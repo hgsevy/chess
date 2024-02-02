@@ -22,6 +22,7 @@ public class ChessGame {
     private boolean blackKingMoved;
     private boolean blackLeftRookMoved;
     private boolean blackRightRookMoved;
+    private ChessMove lastMove;
 
 
     public ChessGame() {
@@ -45,6 +46,7 @@ public class ChessGame {
         blackKingMoved = original.blackKingMoved;
         blackLeftRookMoved = original.blackLeftRookMoved;
         blackRightRookMoved = original.blackRightRookMoved;
+        lastMove = original.lastMove;
     }
 
     /**
@@ -100,6 +102,25 @@ public class ChessGame {
 
         }
         moves.addAll(checkCastleMove(startPosition));
+        if (lastMove != null && board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN && // if you are moving a pawn
+        board.getPiece(startPosition).getTeamColor() == turn && // it is your turn (makes sure you don't capture own pawn)
+        board.getPiece(lastMove.end()).getPieceType() == ChessPiece.PieceType.PAWN && // the last piece moves was a pawn
+        ((lastMove.end().row() == 4 && lastMove.start().row() == 2) || (lastMove.end().row() == 5 && lastMove.start().row() == 7)) && // the lst move was moving the pawn two spaces
+        startPosition.row() == lastMove.end().row()) // this pawn end in the correct row to capture by en passant
+        {
+            int direction;
+            if (turn == TeamColor.BLACK){
+                direction = -1;
+            } else {direction = 1;}
+
+            if (startPosition.col() - lastMove.end().col() == 1){
+                moves.add(new ChessMove(startPosition, new ChessPosition(startPosition.row() + direction, startPosition.col()-1), null));
+            }
+            else if (startPosition.col() - lastMove.end().col() == -1){
+                moves.add(new ChessMove(startPosition, new ChessPosition(startPosition.row() + direction, startPosition.col()+1), null));
+            }
+        }
+
         return moves;
     }
 
@@ -239,11 +260,17 @@ public class ChessGame {
             if (possibleMove.equals(move)){
                 if (board.getPiece(move.start()).getPieceType() == ChessPiece.PieceType.KING && (move.start().col() - move.end().col() == 2) || move.start().col() - move.end().col() == -2){
                     makeCastleMove(move);
-                } else {
+                }
+                else if (board.getPiece(move.start()).getPieceType() == ChessPiece.PieceType.PAWN && move.start().col() != move.end().col() && board.getPiece(move.end()) == null){
+                    makeMoveToCheckMove(move);
+                    board.addPiece(new ChessPosition(move.start().row(), move.end().col()), null);
+                }
+                else {
                     updateBools(board.getPiece(move.start()), move.start());
                     makeMoveToCheckMove(move);
                 }
                 switchTeamTurn();
+                lastMove = move;
                 return;
             }
         }
