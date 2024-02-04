@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 //import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -65,7 +66,7 @@ public class ChessPiece {
         int row = myPosition.row();
         int col = myPosition.col();
 
-        Collection<ChessMove> answer = new ArrayList<>();
+        Collection<ChessMove> answer = new HashSet<>();
 
         switch (type){
             case KING:
@@ -208,7 +209,7 @@ public class ChessPiece {
 
     /**functions to clean up Queen code (because just combination of Bishop and Rook)**/
     private Collection<ChessMove> checkSquareMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> answer = new ArrayList<>();
+        Collection<ChessMove> answer = new HashSet<>();
 
         //check row left
         answer.addAll(checkLine(board, myPosition, 0, -1));
@@ -223,7 +224,7 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> checkDiagonalMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> answer = new ArrayList<>();
+        Collection<ChessMove> answer = new HashSet<>();
 
         //check up left
         answer.addAll(checkLine(board, myPosition, -1, -1));
@@ -246,7 +247,7 @@ public class ChessPiece {
         int i = myPosition.row() + rowDirection;
         int j = myPosition.col() + colDirection;
 
-        Collection<ChessMove> answer = new ArrayList<>();
+        Collection<ChessMove> answer = new HashSet<>();
 
         while (i >= 1 && i <= 8 && j >= 1 && j <= 8){
             if (board.isOpenForPiece(new ChessPosition(i, j), color)){

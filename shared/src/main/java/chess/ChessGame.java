@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 //import static java.util.Collections.addAll;
 
@@ -91,7 +92,7 @@ public class ChessGame {
             return null;
         }
         TeamColor team = board.getPiece(startPosition).getTeamColor();
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         Collection<ChessMove> possibleMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
         for (ChessMove move : possibleMoves){
             ChessGame trialGame = new ChessGame(this);
@@ -125,7 +126,7 @@ public class ChessGame {
     }
 
     private Collection<ChessMove> checkCastleMove(ChessPosition position){
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         boolean validMove;
         if (position.equals(new ChessPosition(8, 5)) && !blackKingMoved){
             if (!blackLeftRookMoved){
@@ -376,7 +377,7 @@ public class ChessGame {
     }
 
     private Collection<ChessMove> allOtherTeamMoves(TeamColor teamColor){
-        Collection<ChessMove> allTheMoves = new ArrayList<>();
+        Collection<ChessMove> allTheMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
                 if (board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
@@ -389,7 +390,7 @@ public class ChessGame {
     }
 
     private Collection<ChessMove> allValidTeamMoves(TeamColor teamColor){
-        Collection<ChessMove> allTheMoves = new ArrayList<>();
+        Collection<ChessMove> allTheMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
                 if (board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
