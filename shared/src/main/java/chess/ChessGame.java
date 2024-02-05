@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -37,7 +36,9 @@ public class ChessGame {
         blackRightRookMoved = false;
     }
 
-    // copy constructor
+    /**
+     * Copy Constructor
+     */
     public ChessGame(ChessGame original) {
         board = new ChessBoard(original.board);
         turn = original.turn;
@@ -66,6 +67,9 @@ public class ChessGame {
         turn = team;
     }
 
+    /**
+     * Used at the end of a move to change whose turn it is
+     */
     private void switchTeamTurn(){
         if (turn == TeamColor.BLACK){
             turn = TeamColor.WHITE;
@@ -103,28 +107,17 @@ public class ChessGame {
 
         }
         moves.addAll(checkCastleMove(startPosition));
-        if (lastMove != null && board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN && // if you are moving a pawn
-        board.getPiece(startPosition).getTeamColor() == turn && // it is your turn (makes sure you don't capture own pawn)
-        board.getPiece(lastMove.end()).getPieceType() == ChessPiece.PieceType.PAWN && // the last piece moves was a pawn
-        ((lastMove.end().row() == 4 && lastMove.start().row() == 2) || (lastMove.end().row() == 5 && lastMove.start().row() == 7)) && // the lst move was moving the pawn two spaces
-        startPosition.row() == lastMove.end().row()) // this pawn end in the correct row to capture by en passant
-        {
-            int direction;
-            if (turn == TeamColor.BLACK){
-                direction = -1;
-            } else {direction = 1;}
-
-            if (startPosition.col() - lastMove.end().col() == 1){
-                moves.add(new ChessMove(startPosition, new ChessPosition(startPosition.row() + direction, startPosition.col()-1), null));
-            }
-            else if (startPosition.col() - lastMove.end().col() == -1){
-                moves.add(new ChessMove(startPosition, new ChessPosition(startPosition.row() + direction, startPosition.col()+1), null));
-            }
-        }
+        moves.addAll(checkEnPassantMove(startPosition));
 
         return moves;
     }
 
+    /* FOLLOWING TWO METHODS ARE TO CHECK OT SEE IF ANY SPECIAL MOVES APPLY AND CAN BE MADE */
+
+    /**
+     * If the entered position is that of a king, checks to see if valid castle moves
+     * @return all valid castling moves, indicated by a king moving two spaces
+     */
     private Collection<ChessMove> checkCastleMove(ChessPosition position){
         Collection<ChessMove> moves = new HashSet<>();
         boolean validMove;
@@ -244,6 +237,33 @@ public class ChessGame {
     }
 
     /**
+     *If the entered position is that of a pawn, see if allowed to capture a pawn that last moved two spots
+     * @return all valid en passant moves, indicated by a pawn moving diagonally to an empty space.
+     */
+    private Collection<ChessMove> checkEnPassantMove(ChessPosition position){
+        Collection<ChessMove> moves =  new HashSet<>();
+        if (lastMove != null && board.getPiece(position).getPieceType() == ChessPiece.PieceType.PAWN && // if you are moving a pawn
+                board.getPiece(position).getTeamColor() == turn && // it is your turn (makes sure you don't capture own pawn)
+                board.getPiece(lastMove.end()).getPieceType() == ChessPiece.PieceType.PAWN && // the last piece moves was a pawn
+                ((lastMove.end().row() == 4 && lastMove.start().row() == 2) || (lastMove.end().row() == 5 && lastMove.start().row() == 7)) && // the lst move was moving the pawn two spaces
+                position.row() == lastMove.end().row()) // this pawn end in the correct row to capture by en passant
+        {
+            int direction;
+            if (turn == TeamColor.BLACK){
+                direction = -1;
+            } else {direction = 1;}
+
+            if (position.col() - lastMove.end().col() == 1){
+                moves.add(new ChessMove(position, new ChessPosition(position.row() + direction, position.col()-1), null));
+            }
+            else if (position.col() - lastMove.end().col() == -1){
+                moves.add(new ChessMove(position, new ChessPosition(position.row() + direction, position.col()+1), null));
+            }
+        }
+        return moves;
+    }
+
+    /**
      * Makes a move in a chess game
      *
      * @param move chess move to preform
@@ -278,6 +298,11 @@ public class ChessGame {
         throw new InvalidMoveException();
     }
 
+    /**
+     * Used in make move to change the booleans used to see if castling moves are valid
+     * @param piece what just moved
+     * @param start where the piece was, used to know which rook moved
+     */
     private void updateBools(ChessPiece piece, ChessPosition start){
         if (start.row() == 8 && piece.getTeamColor() == TeamColor.BLACK){
             if (piece.getPieceType() == ChessPiece.PieceType.KING){
@@ -341,6 +366,10 @@ public class ChessGame {
         }
     }
 
+    /**
+     * Used in trial games to know if moves put king in check without seeing if move is valid
+     * (because we don't know what is valid when the function is used)
+     */
     private void makeMoveToCheckMove(ChessMove move) {
         if (move.promotion() != null){
             board.addPiece(move.end(), new ChessPiece(board.getPiece(move.start()).getTeamColor(), move.promotion()));
@@ -376,19 +405,9 @@ public class ChessGame {
         return false;
     }
 
-    private Collection<ChessMove> allOtherTeamMoves(TeamColor teamColor){
-        Collection<ChessMove> allTheMoves = new HashSet<>();
-        for (int i = 1; i <= 8; i++){
-            for (int j = 1; j <= 8; j++){
-                if (board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
-                    Collection<ChessMove> someMoves = board.getPiece(new ChessPosition(i,j)).pieceMoves(board, new ChessPosition(i,j));
-                    allTheMoves.addAll(someMoves);
-                }
-            }
-        }
-        return allTheMoves;
-    }
-
+    /**
+     * @return all valid moves for a given team
+     */
     private Collection<ChessMove> allValidTeamMoves(TeamColor teamColor){
         Collection<ChessMove> allTheMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++){
@@ -402,6 +421,26 @@ public class ChessGame {
         return allTheMoves;
     }
 
+    /**
+     * Similar to all team moves, but doesn't check to see if moves are valid
+     */
+    private Collection<ChessMove> allOtherTeamMoves(TeamColor teamColor){
+        Collection<ChessMove> allTheMoves = new HashSet<>();
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                if (board.getPiece(new ChessPosition(i,j)) != null && board.getPiece(new ChessPosition(i,j)).getTeamColor() == teamColor){
+                    Collection<ChessMove> someMoves = board.getPiece(new ChessPosition(i,j)).pieceMoves(board, new ChessPosition(i,j));
+                    allTheMoves.addAll(someMoves);
+                }
+            }
+        }
+        return allTheMoves;
+    }
+
+    /**
+     * Used when checking for check
+     * @return ChessPosition for given team's king
+     */
     private ChessPosition getKingPosition(TeamColor color){
         ChessPiece kingToFind = new ChessPiece(color, ChessPiece.PieceType.KING);
         for (int i = 1; i <= 8; i++){
@@ -427,7 +466,7 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves
+     * no valid moves and is not in check
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
