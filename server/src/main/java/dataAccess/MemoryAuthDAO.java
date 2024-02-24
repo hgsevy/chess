@@ -38,13 +38,14 @@ public class MemoryAuthDAO  implements AuthDAO{
         throw new DataAccessException("auth token does not exist");
     }
 
-    public void deleteAuthToken(String token) {
+    public void deleteAuthToken(String token) throws DataAccessException{
         for (int i = 0; i < database.size(); i++){
             if (database.get(i).authToken().equals(token)){
                 database.remove(i);
                 return;
             }
         }
+        throw new DataAccessException("auth Token never existed");
 
     }
 
