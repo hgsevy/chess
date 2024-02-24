@@ -5,7 +5,6 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 public class MemoryGameDAO implements GameDAO{
 
@@ -23,8 +22,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public void joinGame(String username, int gameID, ChessGame.TeamColor color) throws DataAccessException { //FIXME: HELP WHY ERRORS
-        GameData dataToRemove;
-        GameData newData;
         for(int i = 0; i < database.size(); i++){
             if(database.get(i).gameID() == gameID){
                 if(color == ChessGame.TeamColor.BLACK){
@@ -56,8 +53,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public void updateGame(int gameID, ChessGame game) throws DataAccessException{
-        GameData dataToRemove;
-        GameData newData;
         for(int i = 0; i < database.size(); i++){
             if(database.get(i).gameID() == gameID){
                 GameData oldData = database.get(i);

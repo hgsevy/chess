@@ -5,8 +5,6 @@ import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.UserDAO;
 import model.GameData;
-import spark.Request;
-import spark.Response;
 
 import java.util.Collection;
 

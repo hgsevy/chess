@@ -1,9 +1,6 @@
 package dataAccess;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-
-import chess.*;
 import model.AuthData;
 
 public class MemoryAuthDAO  implements AuthDAO{

@@ -4,8 +4,6 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.UserData;
-import spark.Request;
-import spark.Response;
 
 public class UserService {
 
