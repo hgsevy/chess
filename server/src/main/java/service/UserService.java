@@ -4,6 +4,8 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.UserData;
+import service.exceptions.NoCanDoException;
+import service.exceptions.UnauthorizedException;
 
 public class UserService {
 
@@ -14,20 +16,32 @@ public class UserService {
         this.userData = userData;
         this.authData = authData;
     }
-    public LoginResult login(LoginRequest enteredData) throws DataAccessException, UnauthorizedException {
-        UserData user = userData.getUser(enteredData.username());
-        if (!user.password().equals(enteredData.password())){
-            throw new UnauthorizedException("incorrect password");
+    public LoginResult login(LoginRequest enteredData) throws UnauthorizedException {
+        try {
+            UserData user = userData.getUser(enteredData.username());
+            if (!user.password().equals(enteredData.password())){
+                throw new UnauthorizedException();
+            }
+        } catch (DataAccessException exp1) {
+            throw new UnauthorizedException();
         }
         return new LoginResult(enteredData.username(), authData.createAuthToken(enteredData.username()));
     }
 
-    public LoginResult register(UserData newUser) throws DataAccessException{
-        userData.createUser(newUser);
+    public LoginResult register(UserData newUser) throws NoCanDoException {
+        try {
+            userData.createUser(newUser);
+        } catch (DataAccessException expt1){
+            throw new NoCanDoException();
+        }
         return new LoginResult(newUser.username(), authData.createAuthToken(newUser.username()));
     }
 
-    public void logout(String token) throws DataAccessException{
-        authData.deleteAuthToken(token);
+    public void logout(String token) throws UnauthorizedException{
+        try {
+            authData.deleteAuthToken(token);
+        } catch (DataAccessException expt1){
+            throw new UnauthorizedException();
+        }
     }
 }

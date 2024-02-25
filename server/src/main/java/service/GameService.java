@@ -5,6 +5,8 @@ import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.UserDAO;
 import model.GameData;
+import service.exceptions.NoCanDoException;
+import service.exceptions.UnauthorizedException;
 
 import java.util.Collection;
 
@@ -20,21 +22,25 @@ public class GameService {
         this.gameData = gameData;
     }
 
-    public void join(JoinGameRequest req) throws DataAccessException, UnauthorizedException {
+    public void join(JoinGameRequest req) throws UnauthorizedException, NoCanDoException {
         String username;
         try {
             username = authData.getUsername(req.token());
         } catch (DataAccessException expt1) {
-            throw new UnauthorizedException("no authorization");
+            throw new UnauthorizedException();
         }
-        gameData.joinGame(username, req.gameID(), req.color());
+        try {
+            gameData.joinGame(username, req.gameID(), req.color());
+        } catch (DataAccessException expt2){
+            throw new NoCanDoException();
+        }
     }
 
     public Collection<GameData> list(String authToken) throws UnauthorizedException {
         try {
             authData.getUsername(authToken);
         } catch (DataAccessException expt1) {
-            throw new UnauthorizedException("no authorization");
+            throw new UnauthorizedException();
         }
         return gameData.listGames();
     }
@@ -43,7 +49,7 @@ public class GameService {
         try {
             authData.getUsername(req.authToken());
         } catch (DataAccessException expt1) {
-            throw new UnauthorizedException("no authorization");
+            throw new UnauthorizedException();
         }
         return gameData.createGame(req.gameName());
     }
