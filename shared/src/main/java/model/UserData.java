@@ -1,4 +1,4 @@
-package model; // TODO: ask about packages vs folders
+package model;
 
 public record UserData(String username, String password, String email) {
 }
