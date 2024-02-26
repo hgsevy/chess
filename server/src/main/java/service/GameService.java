@@ -7,6 +7,8 @@ import dataAccess.UserDAO;
 import model.GameData;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
+import service.requestsAndResults.CreateGameRequest;
+import service.requestsAndResults.JoinGameRequest;
 
 import java.util.Collection;
 

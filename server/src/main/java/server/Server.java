@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import dataAccess.*;
 import model.GameData;
 import model.UserData;
@@ -10,6 +9,10 @@ import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.ServiceException;
 import service.exceptions.UnauthorizedException;
+import service.requestsAndResults.CreateGameRequest;
+import service.requestsAndResults.JoinGameRequest;
+import service.requestsAndResults.LoginRequest;
+import service.requestsAndResults.LoginResult;
 import spark.*;
 
 import java.util.Collection;

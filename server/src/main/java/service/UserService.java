@@ -7,6 +7,8 @@ import model.UserData;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
+import service.requestsAndResults.LoginRequest;
+import service.requestsAndResults.LoginResult;
 
 public class UserService {
 
