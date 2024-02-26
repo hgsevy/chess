@@ -4,6 +4,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.UserData;
+import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
 
@@ -16,7 +17,10 @@ public class UserService {
         this.userData = userData;
         this.authData = authData;
     }
-    public LoginResult login(LoginRequest enteredData) throws UnauthorizedException {
+    public LoginResult login(LoginRequest enteredData) throws UnauthorizedException, BadInputException {
+        if (enteredData.username() == null || enteredData.password() == null){
+            throw new BadInputException();
+        }
         try {
             UserData user = userData.getUser(enteredData.username());
             if (!user.password().equals(enteredData.password())){
@@ -28,7 +32,10 @@ public class UserService {
         return new LoginResult(enteredData.username(), authData.createAuthToken(enteredData.username()));
     }
 
-    public LoginResult register(UserData newUser) throws NoCanDoException {
+    public LoginResult register(UserData newUser) throws NoCanDoException, BadInputException {
+        if (newUser.username() == null || newUser.password() == null || newUser.email() == null){
+            throw new BadInputException();
+        }
         try {
             userData.createUser(newUser);
         } catch (DataAccessException expt1){

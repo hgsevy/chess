@@ -1,6 +1,8 @@
 package dataAccess;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
 import model.AuthData;
 
 public class MemoryAuthDAO  implements AuthDAO{
@@ -12,7 +14,7 @@ public class MemoryAuthDAO  implements AuthDAO{
     }
 
     public String createAuthToken(String username) {
-        String token = username; // FIXME: figure out how to generate a random string
+        String token = UUID.randomUUID().toString();
         database.add(new AuthData(token, username));
         return token;
     }

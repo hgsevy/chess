@@ -6,6 +6,7 @@ import dataAccess.*;
 import model.GameData;
 import model.UserData;
 import service.*;
+import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.ServiceException;
 import service.exceptions.UnauthorizedException;
@@ -74,7 +75,7 @@ public class Server {
         return "";
     }
 
-    private Object registerHandler(Request req, Response resp) throws NoCanDoException {
+    private Object registerHandler(Request req, Response resp) throws NoCanDoException, BadInputException {
         UserData newUser = new Gson().fromJson(req.body(), UserData.class);
         LoginResult result = userService.register(newUser);
         resp.status(200);
@@ -83,7 +84,7 @@ public class Server {
         return message;
     }
 
-    private Object loginHandler(Request req, Response resp) throws UnauthorizedException {
+    private Object loginHandler(Request req, Response resp) throws UnauthorizedException, BadInputException {
         LoginRequest enteredData = new Gson().fromJson(req.body(), LoginRequest.class);
         LoginResult result = userService.login(enteredData);
         resp.status(200);
