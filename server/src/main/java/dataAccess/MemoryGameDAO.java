@@ -21,11 +21,14 @@ public class MemoryGameDAO implements GameDAO{
         return gameNumber++;
     }
 
-    public void joinGame(String username, int gameID, ChessGame.TeamColor color) throws DataAccessException { //FIXME: HELP WHY ERRORS
+    public void joinGame(String username, int gameID, ChessGame.TeamColor color) throws DataAccessException {
         for(int i = 0; i < database.size(); i++){
             if(database.get(i).gameID() == gameID){
-                if(color == ChessGame.TeamColor.BLACK){
-                    if (database.get(i).blackUsername() != null){
+                if (color == null){
+                    return; // this is where we would create a list of non-participating watchers
+                }
+                else if(color == ChessGame.TeamColor.BLACK){
+                    if (database.get(i).blackUsername() != null && database.get(i).blackUsername().equals(username)){
                         throw new DataAccessException("spot already taken");
                     }
                     GameData oldData = database.get(i);
@@ -33,7 +36,7 @@ public class MemoryGameDAO implements GameDAO{
                     database.add(new GameData(oldData.gameID(), oldData.whiteUsername(), username, oldData.gameName(), oldData.game()));
                     return;
                 }
-                else {
+                else if(color == ChessGame.TeamColor.WHITE && database.get(i).whiteUsername().equals(username)) {
                     if (database.get(i).whiteUsername() != null){
                         throw new DataAccessException("spot already taken");
                     }
@@ -42,13 +45,14 @@ public class MemoryGameDAO implements GameDAO{
                     database.add(new GameData(oldData.gameID(), username, oldData.blackUsername(), oldData.gameName(), oldData.game()));
                     return;
                 }
+                throw new DataAccessException("color does not exist");
             }
         }
         throw new DataAccessException("game does not exist");
 
     }
 
-    public Collection<GameData> listGames() {
+    public ArrayList<GameData> listGames() {
         return database;
     }
 

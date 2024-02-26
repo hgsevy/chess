@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataAccess.*;
 import model.GameData;
 import model.UserData;
@@ -9,12 +10,14 @@ import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.ServiceException;
 import service.exceptions.UnauthorizedException;
-import service.requestsAndResults.JoinGameRequest;
-import service.requestsAndResults.LoginRequest;
-import service.requestsAndResults.LoginResult;
+import service.requestsAndResults.*;
 import spark.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
+
+import static com.sun.management.HotSpotDiagnosticMXBean.ThreadDumpFormat.JSON;
+
 
 public class Server {
 
@@ -68,13 +71,13 @@ public class Server {
 
     private void exceptionHandler(ServiceException ex, Request req, Response res) {
         res.status(ex.getStatusCode());
-        res.body(new Gson().toJson(ex));
+        res.body(new Gson().toJson(new MessageResponse(ex.getMessage()), MessageResponse.class));
     }
 
     private Object clearHandler(Request req, Response resp){
         clearService.clear();
         resp.status(200);
-        return new Gson().toJson(null);
+        return new Gson().toJson(new MessageResponse("test clear"));
     }
 
     private Object registerHandler(Request req, Response resp) throws NoCanDoException, BadInputException {
@@ -98,14 +101,15 @@ public class Server {
         String token = req.headers("authorization");
         userService.logout(token);
         resp.status(200);
-        return new Gson().toJson(null);
+        return "";
     }
 
     private Object listGamesHandler(Request req, Response resp) throws UnauthorizedException {
         String token = req.headers("authorization");
-        Collection<GameData> list = gameService.list(token);
+        ArrayList<GameData> list = gameService.list(token);
         resp.status(200);
-        resp.body(new Gson().toJson(list, Collection.class));
+        ListGamesResponse answer = new ListGamesResponse(list);
+        resp.body(new Gson().toJson(answer, ListGamesResponse.class));
         return resp.body();
     }
 
@@ -114,16 +118,16 @@ public class Server {
         String gameName = req.params("gameName");
         int gameID = gameService.create(authToken, gameName);
         resp.status(200);
-        resp.body(new Gson().toJson(gameID, int.class));
+        resp.body(new Gson().toJson(new CreateGameResponse(gameID)));
         return resp.body();
     }
 
-    private Object joinGameHandler(Request req, Response resp) throws NoCanDoException, UnauthorizedException {
+    private Object joinGameHandler(Request req, Response resp) throws NoCanDoException, UnauthorizedException, BadInputException {
         String authToken = req.headers("authorization");
         JoinGameRequest gameDetails = new Gson().fromJson(req.body(), JoinGameRequest.class);
         gameService.join(authToken, gameDetails);
         resp.status(200);
-        return new Gson().toJson(null);
+        return new Gson().toJson(new MessageResponse(""));
     }
 
     // spark.exception

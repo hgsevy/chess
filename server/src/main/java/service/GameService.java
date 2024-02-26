@@ -4,10 +4,12 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import model.GameData;
+import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
 import service.requestsAndResults.JoinGameRequest;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class GameService {
@@ -21,7 +23,7 @@ public class GameService {
         this.gameData = gameData;
     }
 
-    public void join(String token, JoinGameRequest req) throws UnauthorizedException, NoCanDoException {
+    public void join(String token, JoinGameRequest req) throws UnauthorizedException, NoCanDoException, BadInputException {
         String username;
         try {
             username = authData.getUsername(token);
@@ -31,11 +33,15 @@ public class GameService {
         try {
             gameData.joinGame(username, req.gameID(), req.color());
         } catch (DataAccessException expt2){
-            throw new NoCanDoException();
+            if (expt2.getLocalizedMessage().contains("taken")) {
+                throw new NoCanDoException();
+            } else if (expt2.getLocalizedMessage().contains("exist") ){
+                throw new BadInputException();
+            }
         }
     }
 
-    public Collection<GameData> list(String authToken) throws UnauthorizedException {
+    public ArrayList<GameData> list(String authToken) throws UnauthorizedException {
         try {
             authData.getUsername(authToken);
         } catch (DataAccessException expt1) {
