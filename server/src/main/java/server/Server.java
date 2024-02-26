@@ -9,7 +9,6 @@ import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.ServiceException;
 import service.exceptions.UnauthorizedException;
-import service.requestsAndResults.CreateGameRequest;
 import service.requestsAndResults.JoinGameRequest;
 import service.requestsAndResults.LoginRequest;
 import service.requestsAndResults.LoginResult;
@@ -30,7 +29,7 @@ public class Server {
 
         clearService = new ClearService(userData, authData, gameData);
         userService = new UserService(userData, authData);
-        gameService = new GameService(userData, authData, gameData);
+        gameService = new GameService(authData, gameData);
     }
 
     public int run(int desiredPort) {
@@ -75,7 +74,7 @@ public class Server {
     private Object clearHandler(Request req, Response resp){
         clearService.clear();
         resp.status(200);
-        return "";
+        return new Gson().toJson(null);
     }
 
     private Object registerHandler(Request req, Response resp) throws NoCanDoException, BadInputException {
@@ -96,14 +95,14 @@ public class Server {
     }
 
     private Object logoutHandler(Request req, Response resp) throws UnauthorizedException {
-        String token = new Gson().fromJson(req.body(), String.class);
+        String token = req.headers("authorization");
         userService.logout(token);
         resp.status(200);
-        return resp.body();
+        return new Gson().toJson(null);
     }
 
     private Object listGamesHandler(Request req, Response resp) throws UnauthorizedException {
-        String token = new Gson().fromJson(req.body(), String.class);
+        String token = req.headers("authorization");
         Collection<GameData> list = gameService.list(token);
         resp.status(200);
         resp.body(new Gson().toJson(list, Collection.class));
@@ -111,18 +110,20 @@ public class Server {
     }
 
     private Object createGameHandler(Request req, Response resp) throws UnauthorizedException {
-        CreateGameRequest gameDetails = new Gson().fromJson(req.body(), CreateGameRequest.class);
-        int gameID = gameService.create(gameDetails);
+        String authToken = req.headers("authorization");
+        String gameName = req.params("gameName");
+        int gameID = gameService.create(authToken, gameName);
         resp.status(200);
         resp.body(new Gson().toJson(gameID, int.class));
         return resp.body();
     }
 
     private Object joinGameHandler(Request req, Response resp) throws NoCanDoException, UnauthorizedException {
+        String authToken = req.headers("authorization");
         JoinGameRequest gameDetails = new Gson().fromJson(req.body(), JoinGameRequest.class);
-        gameService.join(gameDetails);
+        gameService.join(authToken, gameDetails);
         resp.status(200);
-        return resp.body();
+        return new Gson().toJson(null);
     }
 
     // spark.exception

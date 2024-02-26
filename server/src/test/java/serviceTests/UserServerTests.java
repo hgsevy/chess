@@ -99,7 +99,7 @@ public class UserServerTests {
 
     @Test
     @DisplayName("Bad Logout")
-    public void BadLogout() throws NoCanDoException, BadInputException {
+    public void BadLogout() {
         Assertions.assertThrows(UnauthorizedException.class, ()->service.logout("username"));
     }
 }

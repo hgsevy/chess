@@ -3,31 +3,28 @@ package service;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
-import dataAccess.UserDAO;
 import model.GameData;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
-import service.requestsAndResults.CreateGameRequest;
 import service.requestsAndResults.JoinGameRequest;
 
 import java.util.Collection;
 
 public class GameService {
 
-    UserDAO userData;
+
     AuthDAO authData;
     GameDAO gameData;
 
-    public GameService(UserDAO userData, AuthDAO authData, GameDAO gameData){
-        this.userData = userData;
+    public GameService(AuthDAO authData, GameDAO gameData){
         this.authData = authData;
         this.gameData = gameData;
     }
 
-    public void join(JoinGameRequest req) throws UnauthorizedException, NoCanDoException {
+    public void join(String token, JoinGameRequest req) throws UnauthorizedException, NoCanDoException {
         String username;
         try {
-            username = authData.getUsername(req.token());
+            username = authData.getUsername(token);
         } catch (DataAccessException expt1) {
             throw new UnauthorizedException();
         }
@@ -47,12 +44,12 @@ public class GameService {
         return gameData.listGames();
     }
 
-    public int create(CreateGameRequest req) throws UnauthorizedException {
+    public int create(String token, String gameName) throws UnauthorizedException {
         try {
-            authData.getUsername(req.authToken());
+            authData.getUsername(token);
         } catch (DataAccessException expt1) {
             throw new UnauthorizedException();
         }
-        return gameData.createGame(req.gameName());
+        return gameData.createGame(gameName);
     }
 }
