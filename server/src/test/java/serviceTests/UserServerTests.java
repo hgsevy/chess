@@ -16,11 +16,11 @@ public class UserServerTests {
 
     private UserService service;
     private MemoryAuthDAO authData;
-    private UserDAO userData;
+
     @BeforeEach
     public void createObjects(){
         authData = new MemoryAuthDAO();
-        userData = new MemoryUserDAO();
+        UserDAO userData = new MemoryUserDAO();
         service = new UserService(userData, authData);
     }
 
@@ -48,7 +48,7 @@ public class UserServerTests {
 
     @Test
     @DisplayName("Incomplete Registration")
-    public void incompleteRegister() throws NoCanDoException, BadInputException {
+    public void incompleteRegister() {
         String username = "johndoe";
         String password = "12345";
         UserData data = new UserData(username, password, null);
@@ -73,7 +73,7 @@ public class UserServerTests {
 
     @Test
     @DisplayName("Bad Login")
-    public void badLogin() throws NoCanDoException, BadInputException, UnauthorizedException {
+    public void badLogin() throws NoCanDoException, BadInputException {
         String username = "johndoe";
         String password = "12345";
         String email = "jdoe@yahoo.com";
@@ -85,7 +85,7 @@ public class UserServerTests {
 
     @Test
     @DisplayName("Good Logout")
-    public void logout() throws NoCanDoException, BadInputException, UnauthorizedException {
+    public void logout() throws NoCanDoException, BadInputException {
         String username = "johndoe";
         String password = "12345";
         String email = "jdoe@yahoo.com";
@@ -99,13 +99,7 @@ public class UserServerTests {
 
     @Test
     @DisplayName("Bad Logout")
-    public void BadLogout() throws NoCanDoException, BadInputException, UnauthorizedException {
-        String username = "johndoe";
-        String password = "12345";
-        String email = "jdoe@yahoo.com";
-        UserData data = new UserData(username, password, email);
-        LoginResult result = service.register(data);
-
-        Assertions.assertThrows(UnauthorizedException.class, ()->service.logout(username));
+    public void BadLogout() throws NoCanDoException, BadInputException {
+        Assertions.assertThrows(UnauthorizedException.class, ()->service.logout("username"));
     }
 }
