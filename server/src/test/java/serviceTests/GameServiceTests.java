@@ -67,13 +67,15 @@ public class GameServiceTests {
 
     @Test
     @DisplayName("ListGames")
-    public void listGamesTest() throws UnauthorizedException {
+    public void listGamesTest() throws UnauthorizedException, DataAccessException {
         String token = authData.createAuthToken("paul");
 
         int gameID1 = gameData.createGame("test1");
         int gameID2 = gameData.createGame("test2");
         int gameID3 = gameData.createGame("test3");
         int gameID4 = gameData.createGame("test4");
+
+        gameData.joinGame("jane", gameID3, ChessGame.TeamColor.BLACK);
 
         Assertions.assertEquals(4, gameService.list(token).size());
         // TODO: figure out how to make sure the lists are equal
