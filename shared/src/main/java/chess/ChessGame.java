@@ -120,120 +120,76 @@ public class ChessGame {
      */
     private Collection<ChessMove> checkCastleMove(ChessPosition position){
         Collection<ChessMove> moves = new HashSet<>();
-        boolean validMove;
-        if (position.equals(new ChessPosition(8, 5)) && !blackKingMoved){
-            if (!blackLeftRookMoved){
-                // check that all spaces between are blank
-                validMove = true;
-                for (int i = 2; i < 5; i++){
-                    if (board.getPiece(new ChessPosition(8, i)) != null){
-                        validMove = false;
-                    }
-                }
-                if (validMove) {
-                    // check to make sure no one is in check
-                    ChessGame trialGame = new ChessGame(this);
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null));
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 1), new ChessPosition(8, 4), null));
-                    if (!trialGame.isInCheck(TeamColor.BLACK)){
-                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.WHITE);
-                        for(ChessMove move : opposingMoves){
-                            if (move.end().equals(new ChessPosition(8,3))){
-                                validMove = false;
-                            }
-                        }
-                        if (validMove){
-                            moves.add(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null));
-                        }
-                    }
-
-                }
-            }
-            if (!blackRightRookMoved){
-                // check to make sure no one is in check
-                validMove = true;
-                for (int i = 6; i < 7; i++){
-                    if (board.getPiece(new ChessPosition(8, i)) != null){
-                        validMove = false;
-                    }
-                }
-                if (validMove) {
-                    // check to make sure no one is in check
-                    ChessGame trialGame = new ChessGame(this);
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null));
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(8, 8), new ChessPosition(8, 6), null));
-                    if (!trialGame.isInCheck(TeamColor.BLACK)){
-                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.WHITE);
-                        for(ChessMove move : opposingMoves){
-                            if (move.end().equals(new ChessPosition(8,6))){
-                                validMove = false;
-                            }
-                        }
-                        if (validMove){
-                            moves.add(new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null));
-                        }
-                    }
-
-                }
-            }
-        } else if (position.equals(new ChessPosition(1, 5)) && !whiteKingMoved){
-            if (!whiteLeftRookMoved){
-                // check that all spaces between are blank
-                validMove = true;
-                for (int i = 2; i < 5; i++){
-                    if (board.getPiece(new ChessPosition(1, i)) != null){
-                        validMove = false;
-                    }
-                }
-                if (validMove) {
-                    // check to make sure no one is in check
-                    ChessGame trialGame = new ChessGame(this);
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null));
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 1), new ChessPosition(1, 4), null));
-                    if (!trialGame.isInCheck(TeamColor.WHITE)){
-                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.BLACK);
-                        for(ChessMove move : opposingMoves){
-                            if (move.end().equals(new ChessPosition(1,3))){
-                                validMove = false;
-                            }
-                        }
-                        if (validMove){
-                            moves.add(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null));
-                        }
-                    }
-
+        if (board.getPiece(position).getTeamColor() == TeamColor.WHITE && !whiteKingMoved && !isInCheck(TeamColor.WHITE)) {
+            if (!whiteLeftRookMoved) {
+                ChessMove move = castleHelper(TeamColor.WHITE, true);
+                if (move != null) {
+                    moves.add(move);
                 }
             }
             if (!whiteRightRookMoved){
-                // check to make sure no one is in check
-                validMove = true;
-                for (int i = 6; i <= 7; i++){
-                    if (board.getPiece(new ChessPosition(1, i)) != null){
-                        validMove = false;
-                    }
+                ChessMove move = castleHelper(TeamColor.WHITE, false);
+                if (move != null) {
+                    moves.add(move);
                 }
-                if (validMove) {
-                    // check to make sure no one is in check
-                    ChessGame trialGame = new ChessGame(this);
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null));
-                    trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(1, 8), new ChessPosition(1, 6), null));
-                    if (!trialGame.isInCheck(TeamColor.WHITE)){
-                        Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(TeamColor.BLACK);
-                        for(ChessMove move : opposingMoves){
-                            if (move.end().equals(new ChessPosition(1,6))){
-                                validMove = false;
-                            }
-                        }
-                        if (validMove){
-                            moves.add(new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null));
-                        }
-                    }
-
+            }
+        }
+        else if (board.getPiece(position).getTeamColor() == TeamColor.BLACK && !blackKingMoved && !isInCheck(TeamColor.BLACK)) {
+            if (!blackLeftRookMoved) {
+                ChessMove move = castleHelper(TeamColor.BLACK, true);
+                if (move != null) {
+                    moves.add(move);
+                }
+            }
+            if (!blackRightRookMoved){
+                ChessMove move = castleHelper(TeamColor.BLACK, false);
+                if (move != null) {
+                    moves.add(move);
                 }
             }
         }
         return moves;
 
+    }
+
+    private ChessMove castleHelper(TeamColor color, boolean rookIsLeft){
+        // set up
+        int row = 1;
+        int rook = 8;
+        int kingToRookDirection = 1;
+        TeamColor opposing = TeamColor.BLACK;
+        if (color == TeamColor.BLACK){
+            row = 8;
+            opposing = TeamColor.WHITE;
+        }
+        if (rookIsLeft){
+            rook = 1;
+            kingToRookDirection = -1;
+        }
+
+        // see if all spots between are blank
+        int i = 5+kingToRookDirection;
+        while (i < 8 && i > 1){
+            if (board.getPiece(new ChessPosition(row, i)) != null){
+                return null;
+            }
+            i+=kingToRookDirection;
+        }
+        // check to make sure no one is in check
+        ChessGame trialGame = new ChessGame(this);
+        trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(row, 5), new ChessPosition(row, 5+(2*kingToRookDirection)), null));
+        trialGame.makeMoveToCheckMove(new ChessMove(new ChessPosition(row, rook), new ChessPosition(row, 5+kingToRookDirection), null));
+        if (!trialGame.isInCheck(color)){
+            Collection<ChessMove> opposingMoves = trialGame.allOtherTeamMoves(opposing);
+            for(ChessMove move : opposingMoves){
+                if (move.end().equals(new ChessPosition(row,5+kingToRookDirection))){
+                    return null;
+                }
+            }
+            return new ChessMove(new ChessPosition(row, 5), new ChessPosition(row, 5+(2*kingToRookDirection)), null);
+
+        }
+        return null;
     }
 
     /**

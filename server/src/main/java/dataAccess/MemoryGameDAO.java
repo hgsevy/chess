@@ -55,18 +55,6 @@ public class MemoryGameDAO implements GameDAO{
         return database;
     }
 
-    public void updateGame(int gameID, ChessGame game) throws DataAccessException{
-        for(int i = 0; i < database.size(); i++){
-            if(database.get(i).gameID() == gameID){
-                GameData oldData = database.get(i);
-                database.remove(i);
-                database.add(new GameData(oldData.gameID(), oldData.whiteUsername(), oldData.blackUsername(), oldData.gameName(), game));
-                return;
-            }
-        }
-        throw new DataAccessException("game does not exist");
-    }
-
     public void clear() {
         database.clear();
     }
