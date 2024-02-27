@@ -10,7 +10,6 @@ import service.exceptions.UnauthorizedException;
 import service.requestsAndResults.JoinGameRequest;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class GameService {
 
@@ -31,7 +30,7 @@ public class GameService {
             throw new UnauthorizedException();
         }
         try {
-            gameData.joinGame(username, req.gameID(), req.color());
+            gameData.joinGame(username, req.gameID(), req.playerColor());
         } catch (DataAccessException expt2){
             if (expt2.getLocalizedMessage().contains("taken")) {
                 throw new NoCanDoException();

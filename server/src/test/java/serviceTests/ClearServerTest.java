@@ -5,7 +5,6 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.ClearService;
-import service.UserService;
 
 public class ClearServerTest {
     @Test
@@ -25,7 +24,7 @@ public class ClearServerTest {
         clearService.clear();
 
         Assertions.assertThrows(DataAccessException.class, ()->userData.getUser(username));
-        Assertions.assertThrows(DataAccessException.class, ()->authData.getAuth(token));
+        Assertions.assertThrows(DataAccessException.class, ()->authData.getUsername(token));
         Assertions.assertTrue(gameData.listGames().isEmpty());
     }
 }

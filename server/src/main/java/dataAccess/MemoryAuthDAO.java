@@ -19,15 +19,6 @@ public class MemoryAuthDAO  implements AuthDAO{
         return token;
     }
 
-    public void getAuth(String token) throws DataAccessException{
-        for(AuthData user : database){
-            if (user.authToken().equals(token)){
-                return;
-            }
-        }
-        throw new DataAccessException("auth token does not exist");
-    }
-
     public String getUsername(String token) throws DataAccessException{
         for(AuthData user : database){
             if (user.authToken().equals(token)){

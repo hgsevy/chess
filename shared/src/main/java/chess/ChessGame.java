@@ -405,9 +405,7 @@ public class ChessGame {
         return false;
     }
 
-    /**
-     * @return all valid moves for a given team
-     */
+    /**@return all valid moves for a given team*/
     private Collection<ChessMove> allValidTeamMoves(TeamColor teamColor){
         Collection<ChessMove> allTheMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++){
@@ -421,9 +419,7 @@ public class ChessGame {
         return allTheMoves;
     }
 
-    /**
-     * Similar to all team moves, but doesn't check to see if moves are valid
-     */
+    /**Similar to all team moves, but doesn't check to see if moves are valid*/
     private Collection<ChessMove> allOtherTeamMoves(TeamColor teamColor){
         Collection<ChessMove> allTheMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++){
@@ -478,7 +474,6 @@ public class ChessGame {
 
     /**
      * Sets this game's chessboard with a given board
-     *
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
@@ -494,7 +489,6 @@ public class ChessGame {
 
     /**
      * Gets the current chessboard
-     *
      * @return the chessboard
      */
     public ChessBoard getBoard() {

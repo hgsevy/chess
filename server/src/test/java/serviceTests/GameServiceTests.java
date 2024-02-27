@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.GameService;
+import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
 import service.requestsAndResults.JoinGameRequest;
@@ -39,7 +40,7 @@ public class GameServiceTests {
         String username = "jane";
         String token = authData.createAuthToken(username);
 
-        Assertions.assertThrows(NoCanDoException.class, ()->gameService.join(token, new JoinGameRequest(ChessGame.TeamColor.BLACK, 4)));
+        Assertions.assertThrows(BadInputException.class, ()->gameService.join(token, new JoinGameRequest(ChessGame.TeamColor.BLACK, 4)));
     }
 
     @Test

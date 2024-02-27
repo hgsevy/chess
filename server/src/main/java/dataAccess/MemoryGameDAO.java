@@ -4,7 +4,6 @@ import chess.ChessGame;
 import model.GameData;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class MemoryGameDAO implements GameDAO{
 
@@ -28,7 +27,7 @@ public class MemoryGameDAO implements GameDAO{
                     return; // this is where we would create a list of non-participating watchers
                 }
                 else if(color == ChessGame.TeamColor.BLACK){
-                    if (database.get(i).blackUsername() != null && database.get(i).blackUsername().equals(username)){
+                    if (database.get(i).blackUsername() != null && !database.get(i).blackUsername().equals(username)){
                         throw new DataAccessException("spot already taken");
                     }
                     GameData oldData = database.get(i);
@@ -36,8 +35,8 @@ public class MemoryGameDAO implements GameDAO{
                     database.add(new GameData(oldData.gameID(), oldData.whiteUsername(), username, oldData.gameName(), oldData.game()));
                     return;
                 }
-                else if(color == ChessGame.TeamColor.WHITE && database.get(i).whiteUsername().equals(username)) {
-                    if (database.get(i).whiteUsername() != null){
+                else if(color == ChessGame.TeamColor.WHITE ) {
+                    if (database.get(i).whiteUsername() != null && !database.get(i).whiteUsername().equals(username)){
                         throw new DataAccessException("spot already taken");
                     }
                     GameData oldData = database.get(i);

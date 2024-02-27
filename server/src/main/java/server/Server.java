@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import dataAccess.*;
 import model.GameData;
 import model.UserData;
@@ -14,10 +13,6 @@ import service.requestsAndResults.*;
 import spark.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
-import static com.sun.management.HotSpotDiagnosticMXBean.ThreadDumpFormat.JSON;
-
 
 public class Server {
 
@@ -115,8 +110,8 @@ public class Server {
 
     private Object createGameHandler(Request req, Response resp) throws UnauthorizedException {
         String authToken = req.headers("authorization");
-        String gameName = req.params("gameName");
-        int gameID = gameService.create(authToken, gameName);
+        CreateGameRequest enteredData = new Gson().fromJson(req.body(), CreateGameRequest.class);
+        int gameID = gameService.create(authToken, enteredData.gameName());
         resp.status(200);
         resp.body(new Gson().toJson(new CreateGameResponse(gameID)));
         return resp.body();

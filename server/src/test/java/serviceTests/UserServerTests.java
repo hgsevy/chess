@@ -68,7 +68,7 @@ public class UserServerTests {
         Assertions.assertEquals(username, result.username());
         Assertions.assertNotNull(result.authToken());
 
-        Assertions.assertDoesNotThrow(()->authData.getAuth(result.authToken()));
+        Assertions.assertDoesNotThrow(()->authData.getUsername(result.authToken()));
     }
 
     @Test
