@@ -26,7 +26,7 @@ public class Server {
         AuthDAO authData;
         try {
             userData = new SQLUserDAO();
-            gameData = new SQLGameData();
+            gameData = new SQLGameDAO();
             authData = new SQLAuthDAO();
         }
         catch (DataAccessException expt1){

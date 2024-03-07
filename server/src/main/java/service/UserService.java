@@ -4,6 +4,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
@@ -23,9 +24,11 @@ public class UserService {
         if (enteredData.username() == null || enteredData.password() == null){
             throw new BadInputException();
         }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(enteredData.password());
         try {
             UserData user = userData.getUser(enteredData.username());
-            if (!user.password().equals(enteredData.password())){
+            if (!encoder.matches(user.password(), hashedPassword)){
                 throw new UnauthorizedException();
             }
         } catch (DataAccessException exp1) {
@@ -38,6 +41,9 @@ public class UserService {
         if (newUser.username() == null || newUser.password() == null || newUser.email() == null){
             throw new BadInputException();
         }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(newUser.password());
+        UserData hashedUser = new UserData(newUser.username(), hashedPassword, newUser.email());
         try {
             userData.createUser(newUser);
         } catch (DataAccessException expt1){

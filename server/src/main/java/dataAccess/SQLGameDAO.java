@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 import static dataAccess.DatabaseManager.getConnection;
 
-public class SQLGameData implements GameDAO{
+public class SQLGameDAO implements GameDAO{
 
-    public SQLGameData() throws DataAccessException {
+    public SQLGameDAO() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = getConnection()) {
             var createGameTable = """
@@ -21,7 +21,7 @@ public class SQLGameData implements GameDAO{
                 whiteUsername varchar(255),
                 blackUsername varchar(255),
                 gameName varchar(255) NOT NULL,
-                game varchar(255) NOT NULL,
+                game TEXT NOT NULL,
                 PRIMARY KEY (gameID)
             )
             """;
@@ -43,15 +43,16 @@ public class SQLGameData implements GameDAO{
                 insertTableStatement.execute();
             }
             var findGame = "SELECT gameID from gameData WHERE gameName=?";
-            try (var insertTableStatement = conn.prepareStatement(addGame)) {
+            try (var insertTableStatement = conn.prepareStatement(findGame)) {
                 insertTableStatement.setString(1, name);
                 ResultSet rs = insertTableStatement.executeQuery();
+                rs.next();
                 return rs.getInt(1);
             }
         } catch (DataAccessException | SQLException e1) {
-            System.out.print("womp womp: " + e1.getMessage());
+            System.out.print("SQL gd da l 53: " + e1.getMessage());
         }
-        System.out.print("womp womp: somehow got to SQLGameData line 54");
+        System.out.print("SQL gd da l 55: somehow got to SQLGameData line 54");
         return -1;
     }
 
@@ -61,14 +62,14 @@ public class SQLGameData implements GameDAO{
             try (var selectTableStatement = conn.prepareStatement(checkTable)) {
                 selectTableStatement.setInt(1, gameID);
                 ResultSet rs = selectTableStatement.executeQuery();
-                // make sure table exists
+                // make sure game exists
                 if(!rs.next()){
                     throw new DataAccessException("game does not exist");
                 }
                 // choose which spot to join
                 if (color == ChessGame.TeamColor.BLACK){
                     if (rs.getString(1) == null){
-                        var updateUsers = "UPDATE gameData SET blackUsername=? WHERE id = ?;";
+                        var updateUsers = "UPDATE gameData SET blackUsername=? WHERE gameID = ?;";
                         try (var joinStatement = conn.prepareStatement(updateUsers)) {
                             joinStatement.setString(1, username);
                             joinStatement.setInt(2, gameID);
@@ -81,7 +82,7 @@ public class SQLGameData implements GameDAO{
                 }
                 else if (color == ChessGame.TeamColor.WHITE){
                     if (rs.getString(2) == null){
-                        var updateUsers = "UPDATE gameData SET whiteUsername=? WHERE id = ?;";
+                        var updateUsers = "UPDATE gameData SET whiteUsername=? WHERE gameID = ?;";
                         try (var joinStatement = conn.prepareStatement(updateUsers)) {
                             joinStatement.setString(1, username);
                             joinStatement.setInt(2, gameID);
@@ -92,7 +93,7 @@ public class SQLGameData implements GameDAO{
                         throw new DataAccessException("spot already taken");
                     }
                 }
-                else {
+                else if (color != null){
                     throw new DataAccessException("color does not exist");
                 }
 
@@ -101,16 +102,16 @@ public class SQLGameData implements GameDAO{
             if (e1.getMessage().contains("not exist") || e1.getMessage().contains("taken")){
                 throw e1;
             }
-            System.out.print(" DataAccess womp womp: " + e1.getMessage());
+            System.out.print("DataAccess SQL gd l 105: " + e1.getMessage());
         } catch (SQLException e2){
-            System.out.print("SQL womp womp: " + e2.getMessage());
+            System.out.print("SQL gd l 107: " + e2.getMessage());
         }
     }
 
     public ArrayList<GameData> listGames() {
         ArrayList<GameData> answer = new ArrayList<>();
         try (var conn = getConnection()) {
-            String command = "SELECT gameID, whiteUsername, blackUsername, gameName, game";
+            String command = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM gameData";
             try (var listGamesStatement = conn.prepareStatement(command)) {
                 ResultSet rs = listGamesStatement.executeQuery();
 
@@ -120,7 +121,7 @@ public class SQLGameData implements GameDAO{
                 }
             }
         } catch (SQLException | DataAccessException e) {
-            System.out.print("womp womp: " + e.getMessage());
+            System.out.print("SQL gd l 124: " + e.getMessage());
         }
         return answer;
     }
@@ -132,7 +133,7 @@ public class SQLGameData implements GameDAO{
                 clearTableStatement.execute();
             }
         } catch (SQLException | DataAccessException e) {
-            System.out.print("womp womp: " + e.getMessage());
+            System.out.print("SQL gd l 136: " + e.getMessage());
         }
     }
 }
