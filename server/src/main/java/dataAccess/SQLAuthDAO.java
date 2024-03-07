@@ -38,6 +38,7 @@ public class SQLAuthDAO implements AuthDAO{
             }
         } catch (SQLException | DataAccessException e) {
             System.out.print("womp womp: " + e.getMessage());
+            return "-1";
         }
         return token;
     }
