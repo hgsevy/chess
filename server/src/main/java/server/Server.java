@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataAccess.*;
 import model.GameData;
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
 import service.*;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
@@ -14,13 +15,22 @@ import spark.*;
 
 import java.util.ArrayList;
 
+import static java.sql.DriverManager.println;
+
 public class Server {
 
     ClearService clearService;
     UserService userService;
     GameService gameService;
 
-    public Server(){
+    public Server() {
+        System.out.println("test");
+        try {
+            UserDAO testDAO = new SQLUserDAO();
+        }
+        catch (DataAccessException expt1){
+            System.out.println(expt1.getMessage());
+        }
         UserDAO userData = new MemoryUserDAO();
         AuthDAO authData = new MemoryAuthDAO();
         GameDAO gameData = new MemoryGameDAO();
