@@ -64,13 +64,30 @@ public class SQLUserDAO implements UserDAO{
                 insertTableStatement.setString(3, user.email());
                 insertTableStatement.execute();
             }
-        } catch (SQLException | DataAccessException e) {
-            System.out.print("womp womp: " + e.getMessage());
+        } catch (DataAccessException e1) {
+            if (e1.getMessage().contains("already used")){
+                throw e1;
+            }
+            System.out.print("womp womp: " + e1.getMessage());
+        } catch (SQLException e2){
+            System.out.print("womp womp: " + e2.getMessage());
         }
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        return null;
+        try (var conn = getConnection()) {
+            var checkTable = "SELECT username, password, email FROM userData WHERE username=?";
+            try (var selectTableStatement = conn.prepareStatement(checkTable)) {
+                selectTableStatement.setString(1, username);
+                ResultSet rs = selectTableStatement.executeQuery();
+                if(!rs.next()){
+                    throw new DataAccessException("username does not exist");
+                }
+                return new UserData(rs.getString(1), rs.getString(2), rs.getString(3));
+            }
+        } catch (SQLException | DataAccessException e) {
+            System.out.print("womp womp: " + e.getMessage());
+        }
     }
 }
