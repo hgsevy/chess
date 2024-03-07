@@ -86,8 +86,14 @@ public class SQLUserDAO implements UserDAO{
                 }
                 return new UserData(rs.getString(1), rs.getString(2), rs.getString(3));
             }
-        } catch (SQLException | DataAccessException e) {
-            System.out.print("womp womp: " + e.getMessage());
+        } catch (DataAccessException e1) {
+            if (e1.getMessage().contains("not exist")){
+                throw e1;
+            }
+            System.out.print("womp womp: " + e1.getMessage());
+        } catch (SQLException e2){
+            System.out.print("womp womp: " + e2.getMessage());
         }
+        throw new DataAccessException("no idea how I got this far (SQLUSERDAO line 97)");
     }
 }
