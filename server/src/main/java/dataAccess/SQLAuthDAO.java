@@ -67,7 +67,28 @@ public class SQLAuthDAO implements AuthDAO{
     }
 
     public void deleteAuthToken(String token) throws DataAccessException {
-
+        try (var conn = getConnection()) {
+            String command = "SELECT username FROM authData WHERE authToken=?";
+            try (var addTokenStatement = conn.prepareStatement(command)) {
+                addTokenStatement.setString(1, token);
+                ResultSet rs = addTokenStatement.executeQuery();
+                if (!rs.next()){
+                    throw new DataAccessException("auth token does not exist");
+                }
+            }
+            String command2 = "DELETE FROM authData WHERE authToken=?";
+            try (var addTokenStatement = conn.prepareStatement(command2)) {
+                addTokenStatement.setString(1, token);
+                addTokenStatement.execute();
+            }
+        } catch (DataAccessException e1) {
+            if (e1.getMessage().contains("not exist")){
+                throw e1;
+            }
+            System.out.print("womp womp: " + e1.getMessage());
+        } catch (SQLException e2){
+            System.out.print("womp womp: " + e2.getMessage());
+        }
     }
 
     public void clear() {
