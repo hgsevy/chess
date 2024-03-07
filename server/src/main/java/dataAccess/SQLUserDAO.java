@@ -34,7 +34,14 @@ public class SQLUserDAO implements UserDAO{
 
     @Override
     public void clear() {
-
+        try (var conn = getConnection()) {
+            String command = "TRUNCATE userData";
+            try (var clearTableStatement = conn.prepareStatement(command)) {
+                clearTableStatement.execute();
+            }
+        } catch (SQLException | DataAccessException e) {
+            System.out.print("womp womp: " + e.getMessage());
+        }
     }
 
     @Override
