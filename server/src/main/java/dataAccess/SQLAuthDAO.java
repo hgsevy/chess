@@ -2,6 +2,7 @@ package dataAccess;
 
 import model.AuthData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -44,6 +45,24 @@ public class SQLAuthDAO implements AuthDAO{
     }
 
     public String getUsername(String token) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String command = "SELECT username FROM authData WHERE authToken=?";
+            try (var addTokenStatement = conn.prepareStatement(command)) {
+                addTokenStatement.setString(1, token);
+                ResultSet rs = addTokenStatement.executeQuery();
+                if (!rs.next()){
+                    throw new DataAccessException("auth token does not exist");
+                }
+                return rs.getString(1);
+            }
+        } catch (DataAccessException e1) {
+            if (e1.getMessage().contains("not exist")){
+                throw e1;
+            }
+            System.out.print("womp womp: " + e1.getMessage());
+        } catch (SQLException e2){
+            System.out.print("womp womp: " + e2.getMessage());
+        }
         return null;
     }
 
