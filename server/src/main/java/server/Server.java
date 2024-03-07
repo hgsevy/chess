@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataAccess.*;
 import model.GameData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import service.*;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
@@ -14,8 +13,6 @@ import service.requestsAndResults.*;
 import spark.*;
 
 import java.util.ArrayList;
-
-import static java.sql.DriverManager.println;
 
 public class Server {
 

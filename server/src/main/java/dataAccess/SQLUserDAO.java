@@ -9,8 +9,6 @@ import static dataAccess.DatabaseManager.getConnection;
 
 public class SQLUserDAO implements UserDAO{
 
-
-
     public SQLUserDAO() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = getConnection()) {
