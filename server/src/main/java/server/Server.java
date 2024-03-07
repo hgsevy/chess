@@ -21,16 +21,18 @@ public class Server {
     GameService gameService;
 
     public Server() {
-        System.out.println("test");
+        UserDAO userData;
+        GameDAO gameData;
         try {
-            UserDAO testDAO = new SQLUserDAO();
+            userData = new SQLUserDAO();
+            gameData = new SQLGameData();
         }
         catch (DataAccessException expt1){
-            System.out.println(expt1.getMessage());
+            userData = new MemoryUserDAO();
+            gameData = new MemoryGameDAO();
+            System.out.println("using memory storage because: " + expt1.getMessage());
         }
-        UserDAO userData = new MemoryUserDAO();
         AuthDAO authData = new MemoryAuthDAO();
-        GameDAO gameData = new MemoryGameDAO();
 
         clearService = new ClearService(userData, authData, gameData);
         userService = new UserService(userData, authData);

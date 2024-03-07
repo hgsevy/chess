@@ -21,7 +21,8 @@ public class SQLGameData implements GameDAO{
                 whiteUsername varchar(255),
                 blackUsername varchar(255),
                 gameName varchar(255) NOT NULL,
-                game varchar(255) NOT NULL
+                game varchar(255) NOT NULL,
+                PRIMARY KEY (gameID)
             )
             """;
 
@@ -50,7 +51,7 @@ public class SQLGameData implements GameDAO{
         } catch (DataAccessException | SQLException e1) {
             System.out.print("womp womp: " + e1.getMessage());
         }
-        System.out.print("womp womp: somehow got to SQLGameData line 53");
+        System.out.print("womp womp: somehow got to SQLGameData line 54");
         return -1;
     }
 
