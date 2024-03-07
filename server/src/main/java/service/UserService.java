@@ -25,10 +25,9 @@ public class UserService {
             throw new BadInputException();
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(enteredData.password());
         try {
             UserData user = userData.getUser(enteredData.username());
-            if (!encoder.matches(user.password(), hashedPassword)){
+            if (!encoder.matches(enteredData.password(), user.password())){
                 throw new UnauthorizedException();
             }
         } catch (DataAccessException exp1) {
@@ -45,7 +44,7 @@ public class UserService {
         String hashedPassword = encoder.encode(newUser.password());
         UserData hashedUser = new UserData(newUser.username(), hashedPassword, newUser.email());
         try {
-            userData.createUser(newUser);
+            userData.createUser(hashedUser);
         } catch (DataAccessException expt1){
             throw new NoCanDoException();
         }
