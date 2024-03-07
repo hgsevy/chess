@@ -107,7 +107,21 @@ public class SQLGameData implements GameDAO{
     }
 
     public ArrayList<GameData> listGames() {
-        return null;
+        ArrayList<GameData> answer = new ArrayList<>();
+        try (var conn = getConnection()) {
+            String command = "SELECT gameID, whiteUsername, blackUsername, gameName, game";
+            try (var listGamesStatement = conn.prepareStatement(command)) {
+                ResultSet rs = listGamesStatement.executeQuery();
+
+                while (rs.next()){
+                    answer.add(new GameData(rs.getInt(1), rs.getString(2), rs.getString(3),
+                            rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class)));
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            System.out.print("womp womp: " + e.getMessage());
+        }
+        return answer;
     }
 
     public void clear() {
