@@ -14,13 +14,13 @@ public class AuthDAOTests {
         database = new SQLAuthDAO();
     }
     @Test
-    public void createAuthGood() throws DataAccessException {
+    public void createAuthGood(){
         String token = database.createAuthToken("username");
         Assertions.assertNotNull(token);
     }
 
     @Test
-    public void createAuthBad() throws DataAccessException {
+    public void createAuthBad(){
         Assertions.assertEquals("-1", database.createAuthToken(null));
     }
 
@@ -31,23 +31,23 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void getUsernameBad() throws DataAccessException {
+    public void getUsernameBad(){
         Assertions.assertThrows(DataAccessException.class, ()->database.getUsername("wrong"));
     }
 
     @Test
-    public void deleteAuthGood() throws DataAccessException {
+    public void deleteAuthGood(){
         String token = database.createAuthToken("username");
         Assertions.assertDoesNotThrow(()->database.deleteAuthToken(token));
     }
 
     @Test
-    public void deleteAuthBad() throws DataAccessException {
+    public void deleteAuthBad(){
         Assertions.assertThrows(DataAccessException.class, ()->database.deleteAuthToken("wrong"));
     }
 
     @Test
-    public void clearTest() throws DataAccessException {
+    public void clearTest(){
         String token = database.createAuthToken("username");
         Assertions.assertDoesNotThrow(()->database.getUsername(token));
         database.clear();
