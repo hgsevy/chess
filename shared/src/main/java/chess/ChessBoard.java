@@ -97,6 +97,10 @@ public class ChessBoard {
         }
     }
 
+    public ChessPiece[][] getArray(){
+        return board;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

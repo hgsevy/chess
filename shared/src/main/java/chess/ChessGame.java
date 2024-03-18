@@ -27,6 +27,7 @@ public class ChessGame {
 
     public ChessGame() {
         board = new ChessBoard();
+        board.resetBoard();
         turn = TeamColor.WHITE;
         whiteKingMoved = false;
         whiteLeftRookMoved = false;
