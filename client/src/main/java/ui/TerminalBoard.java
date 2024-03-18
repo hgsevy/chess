@@ -104,33 +104,31 @@ public class TerminalBoard {
         out.print(SQUARE_SPACE);
     }
 
-    private static String getPiece(PrintStream out, ChessPiece piece){
+    private static String getPiece(PrintStream out, ChessPiece piece) {
         ChessGame.TeamColor color = piece.getTeamColor();
         ChessPiece.PieceType type = piece.getPieceType();
 
-        if (color == ChessGame.TeamColor.BLACK){
+        if (color == ChessGame.TeamColor.BLACK) {
             out.print(SET_TEXT_COLOR_BLUE);
-            if (type == ChessPiece.PieceType.KING){
-                return BLACK_KING;
-            }
-            else if (type == ChessPiece.PieceType.QUEEN){
-                return BLACK_QUEEN;
-            }
-            else if (type == ChessPiece.PieceType.ROOK){
-                return BLACK_ROOK;
-            }
-            else if (type == ChessPiece.PieceType.KNIGHT){
-                return BLACK_KNIGHT;
-            }
-            else if (type == ChessPiece.PieceType.BISHOP){
-                return BLACK_BISHOP;
-            }
-            else{
-                return BLACK_PAWN;
-            }
-        }
-        else{
+        } else {
             out.print(SET_TEXT_COLOR_MAGENTA);
+        }
+        if (type == ChessPiece.PieceType.KING) {
+            return BLACK_KING;
+        } else if (type == ChessPiece.PieceType.QUEEN) {
+            return BLACK_QUEEN;
+        } else if (type == ChessPiece.PieceType.ROOK) {
+            return BLACK_ROOK;
+        } else if (type == ChessPiece.PieceType.KNIGHT) {
+            return BLACK_KNIGHT;
+        } else if (type == ChessPiece.PieceType.BISHOP) {
+            return BLACK_BISHOP;
+        } else {
+            return BLACK_PAWN;
+        }
+        /*
+        else{
+            out.print(SET_TEXT_COLOR_BLUE);
             if (type == ChessPiece.PieceType.KING){
                 return WHITE_KING;
             }
@@ -149,7 +147,7 @@ public class TerminalBoard {
             else{
                 return WHITE_PAWN;
             }
-        }
+            */
     }
 
 }
