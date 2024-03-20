@@ -126,28 +126,6 @@ public class TerminalBoard {
         } else {
             return BLACK_PAWN;
         }
-        /*
-        else{
-            out.print(SET_TEXT_COLOR_BLUE);
-            if (type == ChessPiece.PieceType.KING){
-                return WHITE_KING;
-            }
-            else if (type == ChessPiece.PieceType.QUEEN){
-                return WHITE_QUEEN;
-            }
-            else if (type == ChessPiece.PieceType.ROOK){
-                return WHITE_ROOK;
-            }
-            else if (type == ChessPiece.PieceType.KNIGHT){
-                return WHITE_KNIGHT;
-            }
-            else if (type == ChessPiece.PieceType.BISHOP){
-                return WHITE_BISHOP;
-            }
-            else{
-                return WHITE_PAWN;
-            }
-            */
     }
 
 }

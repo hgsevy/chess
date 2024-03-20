@@ -10,7 +10,7 @@ import service.GameService;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
-import service.requestsAndResults.JoinGameRequest;
+import model.requestsAndResults.JoinGameRequest;
 
 public class GameServiceTests {
     private GameService gameService;

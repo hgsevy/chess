@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 import dataAccess.*;
 import model.GameData;
 import model.UserData;
+import model.requestsAndResults.*;
 import service.*;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.ServiceException;
 import service.exceptions.UnauthorizedException;
-import service.requestsAndResults.*;
 import spark.*;
 
 import java.util.ArrayList;

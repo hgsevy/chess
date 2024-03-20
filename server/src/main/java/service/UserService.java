@@ -8,8 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.exceptions.BadInputException;
 import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
-import service.requestsAndResults.LoginRequest;
-import service.requestsAndResults.LoginResult;
+import model.requestsAndResults.LoginRequest;
+import model.requestsAndResults.LoginResult;
 
 public class UserService {
 
