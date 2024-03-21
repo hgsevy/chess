@@ -26,6 +26,15 @@ public class TerminalBoard {
         displayBoard(out, board.getBoard().getArray(), true);
     }
 
+    public static void displayStartBoards(PrintStream out){
+        ChessGame board = new ChessGame();
+
+        displayBoard(out, board.getBoard().getArray(), false);
+        out.print(SET_BG_COLOR_BLACK);
+        out.println();
+        displayBoard(out, board.getBoard().getArray(), true);
+    }
+
     public static void displayBoard(PrintStream out, ChessPiece[][] board, boolean isForBlack){
         // draw header
         drawHorizontalBoarder(out, isForBlack);

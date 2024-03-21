@@ -13,14 +13,15 @@ public class UserTest {
     public static void init() {
         server = new Server();
         var port = server.run(8080);
-        System.out.println("Started test HTTP server on " + port);
+        System.out.println("Started test HTTP server on " + port + '\n');
     }
 
 
     public static void main(String[] args) {
         init();
 
-        TerminalMenus.main(null);
+        TerminalMenus thing = new TerminalMenus();
+        thing.runThis();
 
         server.stop();
     }

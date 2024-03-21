@@ -24,12 +24,6 @@ public class ServerFacadeTests {
 
 
 
-    public static void userTest(String[] args) {
-        server = new Server();
-        var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
 
-        TerminalMenus.main(null);
-    }
 
 }
