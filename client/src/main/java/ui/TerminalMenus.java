@@ -183,8 +183,7 @@ public class TerminalMenus {
             throw new BadInputException("wrong number of arguments");
         } else if (words.length < 2){
             errorDisplay(out);
-            out.println("you didn't include a game name");
-            throw new BadInputException("wrong number of arguments");
+            throw new BadInputException("you didn't include a game name");
         }
 
         server.create(words[1]);
