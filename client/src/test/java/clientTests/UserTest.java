@@ -12,7 +12,7 @@ public class UserTest {
 
     public static void init() {
         server = new Server();
-        var port = server.run(8080);
+        var port = server.run(3306);
         System.out.println("Started test HTTP server on " + port + '\n');
     }
 
@@ -20,7 +20,7 @@ public class UserTest {
     public static void main(String[] args) {
         init();
 
-        TerminalMenus thing = new TerminalMenus(8080);
+        TerminalMenus thing = new TerminalMenus(3306);
         thing.runThis();
 
         server.stop();

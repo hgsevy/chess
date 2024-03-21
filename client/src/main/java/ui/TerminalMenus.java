@@ -50,14 +50,14 @@ public class TerminalMenus {
             if (!server.isLoggedIn()) { // pre-login menu
                 if (line.contains("register")) {
                     try {
-                        register(out, line);
+                        register(line);
                     } catch (BadInputException e1) {
                         errorDisplay(out);
                         out.println(e1.getMessage());
                     }
                 } else if (line.contains("login")) {
                     try {
-                        login(out, line);
+                        login(line);
                     } catch (BadInputException | IOException e1) {
                         errorDisplay(out);
                         out.println(e1.getMessage() + " try again");
@@ -75,7 +75,7 @@ public class TerminalMenus {
                }
                else if (line.contains("logout")){
                    try {
-                       logout(out);
+                       logout();
                    } catch (BadInputException e1){
                        errorDisplay(out);
                        out.println("There was an exception thrown, try again");
@@ -147,10 +147,9 @@ public class TerminalMenus {
         out.println();
     }
 
-    private void register(PrintStream out, String command) throws BadInputException {
+    private void register(String command) throws BadInputException {
         String[] words = command.split(" ");
         if (words.length != 4){
-            errorDisplay(out);
             throw new BadInputException("wrong number of arguments");
         }
 
@@ -158,19 +157,17 @@ public class TerminalMenus {
         username = words[1];
     }
 
-    private void login(PrintStream out, String command) throws IOException, BadInputException {
+    private void login(String command) throws IOException, BadInputException {
         String[] words = command.split(" ");
         if (words.length != 3){
-            errorDisplay(out);
-            out.println("you had " + (words.length - 1) + " arguments when you should have had 2");
-            throw new BadInputException("wrong number of arguments");
+            throw new BadInputException("you had " + (words.length - 1) + " arguments when you should have had 2");
         }
 
         server.login(words[1], words[2]);
         username = words[1];
     }
 
-    private void logout(PrintStream out) throws BadInputException {
+    private void logout() throws BadInputException {
         server.logout();
         username = null;
     }
@@ -190,41 +187,7 @@ public class TerminalMenus {
     }
 
     private void list(PrintStream out) throws BadInputException {
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL("http://localhost:8080/game");
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e1){
-            System.out.println("You mistyped the url on line 121");
-            return;
-        }
-
-        connection.setReadTimeout(5000);
-        try {
-            connection.setRequestMethod("GET");
-            connection.setDoOutput(true);
-        } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 130");
-        }
-
-        connection.addRequestProperty("Authorization", authToken);
-
-        try {
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                InputStream responseBody = connection.getInputStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                gameList = new Gson().fromJson(output, ListGamesResponse.class).games();
-            } else {
-                // SERVER RETURNED AN HTTP ERROR
-                InputStream responseBody = connection.getErrorStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-            }
-        } catch (IOException e1){
-            throw new BadInputException(e1.getMessage());
-        }
-
+        gameList = server.list();
         displayList(out);
     }
 
