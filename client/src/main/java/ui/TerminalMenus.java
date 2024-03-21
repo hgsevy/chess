@@ -16,47 +16,80 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class TerminalMenus {
-    public static void main(String[] args){
+import static ui.EscapeSequences.*;
 
+public class TerminalMenus {
+    private String authToken = "";
+    public void runThis(String[] args){
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.println("Welcome to the chess terminal. Type \"help\" to get started");
         Scanner scanner = new Scanner(System.in);
         String line = "";
 
-        String authToken;
-
         do{
-            if (line.contains("register")){
-                try {
-                    authToken = register(out, line);
-                } catch (BadInputException | IOException e1){
-                    System.out.println("There was an exception thrown, try again");
+            if (authToken.isEmpty()) { // pre-login menu
+                if (line.contains("register")) {
+                    try {
+                        authToken = register(out, line);
+                    } catch (BadInputException | IOException e1) {
+                        errorDisplay(out);
+                        out.println(e1.getMessage());
+                    }
+                } else if (line.contains("login")) {
+                    try {
+                        authToken = login(out, line);
+                    } catch (BadInputException | IOException e1) {
+                        errorDisplay(out);
+                        out.println("There was an exception thrown, try again");
+                    }
+                } else if (line.equals("help")) {
+                    helpPreLoginDisplay(out);
+                } else {
+                    out.println("Unrecognised command");
                 }
+                out.print("[LOGGED OUT] >>> ");
             }
-            else if (line.contains("login")){
-                try {
-                    authToken = login(out, line);
-                } catch (BadInputException | IOException e1){
-                    System.out.println("There was an exception thrown, try again");
-                }
+            else { // post login menu
+               if (line.contains("help")){
+                   helpPostLoginDisplay(out);
+               }
+               else if (line.contains("logout")){
+                   logout(out);
+               }
+               else if (line.contains("create")){
+                   create(out, line);
+               }
+               else if (line.contains("list")){
+                   list(out);
+               }
+               else if (line.contains("join")){
+                   join(out);
+               }
+               else if (line.contains("observe")){
+                   observe(out);
+               }
+               out.print("[LOGGED IN] >>>");
             }
-            else if (line.equals("help")){
-                helpDisplay(out);
-            }
-            out.print("[LOGGED OUT] >>> ");
             out.flush();
             line = scanner.nextLine();
         } while (!line.equals("quit"));
     }
-    public static void helpDisplay(PrintStream out){
-        out.print("register <USERNAME> <PASSWORD> <EMAIL>: create an account by entering username, password, and email");
+    private static void helpPreLoginDisplay(PrintStream out){
+        out.println("register <USERNAME> <PASSWORD> <EMAIL>: create an account by entering username, password, and email");
+        out.println("login <USERNAME> <PASSWORD>: play chess after entering a valid username and password");
+        out.println("quit: exits the program");
+        out.println("help: displays possible commands and explanations");
         out.println();
-        out.print("login <USERNAME> <PASSWORD>: play chess after entering a valid username and password");
-        out.println();
-        out.print("quit: exits the program");
-        out.println();
-        out.print("help: displays possible commands and explanations");
+    }
+
+    public static void helpPostLoginDisplay(PrintStream out){
+        out.println("create <NAME>: create a game by entering the name");
+        out.println("list: list all games");
+        out.println("join <ID> WHITE|BLACK|<empty>: joins a created chess game");
+        out.println("observe <ID>: observe a create chess game");
+        out.println("logout");
+        out.println("quit: exits the program");
+        out.println("help: displays possible commands and explanations");
         out.println();
     }
 
@@ -153,6 +186,7 @@ public class TerminalMenus {
 
     public static void errorDisplay(PrintStream out) {
         //TODO: make it so text is red and bold??
+        out.print(SET_BG_COLOR_RED);
     }
 
     public void doGet(String urlString) throws IOException {
