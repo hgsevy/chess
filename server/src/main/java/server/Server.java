@@ -71,6 +71,7 @@ public class Server {
     }
 
     public void stop() {
+        clearService.clear();
         Spark.stop();
         Spark.awaitStop();
     }

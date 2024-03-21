@@ -6,7 +6,6 @@ import org.junit.jupiter.api.*;
 import server.Server;
 
 import ui.BadInputException;
-import ui.TerminalMenus;
 
 
 public class ServerFacadeTests {
@@ -36,13 +35,13 @@ public class ServerFacadeTests {
     @Test
     public void registerRepeat() throws BadInputException{
         thing.register("username1", "123", "gmail1");
-        Assertions.assertThrows(BadInputException.class, ()->thing.register("username", "123", "gmail"));
+        Assertions.assertThrows(BadInputException.class, ()->thing.register("username1", "123", "gmail1"));
     }
 
     @Test
     public void loginGood() throws BadInputException {
         thing.register("username2", "123", "gmail2");
-        Assertions.assertDoesNotThrow(()->thing.login("username", "123"));
+        Assertions.assertDoesNotThrow(()->thing.login("username2", "123"));
     }
 
     @Test
