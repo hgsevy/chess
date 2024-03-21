@@ -50,9 +50,9 @@ public class TerminalMenus {
         } while (!line.equals("quit"));
     }
     public static void helpDisplay(PrintStream out){
-        out.print("register <USERNAME> <pASS: create an account by entering username, password, and email");
+        out.print("register <USERNAME> <PASSWORD> <EMAIL>: create an account by entering username, password, and email");
         out.println();
-        out.print("login: play chess after entering a valid username and password");
+        out.print("login <USERNAME> <PASSWORD>: play chess after entering a valid username and password");
         out.println();
         out.print("quit: exits the program");
         out.println();
@@ -72,22 +72,24 @@ public class TerminalMenus {
             url = new URL("http://localhost:8080/user");
             connection = (HttpURLConnection) url.openConnection();
         } catch (IOException e1){
-            System.out.println("You mistyped the url on line 58");
+            System.out.println("You mistyped the url on line 75");
             throw new IOException("bad website");
         }
 
         connection.setReadTimeout(5000);
         try {
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
         } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 70");
+            System.out.println("You used the wrong HTTP method on line 83");
         }
 
         try(OutputStream requestBody = connection.getOutputStream();) {
             UserData input = new UserData(words[1], words[2], words[3]);
             requestBody.write((new Gson().toJson(input)).getBytes());
         } catch (IOException e) {
-            System.out.println("Error on line 79");
+            System.out.println("Error on line 90");
+            System.out.println(e.getMessage());
         }
 
 
@@ -107,6 +109,7 @@ public class TerminalMenus {
         String[] words = command.split(" ");
         if (words.length != 3){
             errorDisplay(out);
+            out.println("you had " + (words.length - 1) + " arguments when you should have had 2");
             throw new BadInputException("wrong number of arguments");
         }
 
@@ -116,15 +119,16 @@ public class TerminalMenus {
             url = new URL("http://localhost:8080/session");
             connection = (HttpURLConnection) url.openConnection();
         } catch (IOException e1){
-            System.out.println("You mistyped the url on line 58");
+            System.out.println("You mistyped the url on line 121");
             throw new IOException("bad website");
         }
 
         connection.setReadTimeout(5000);
         try {
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
         } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 70");
+            System.out.println("You used the wrong HTTP method on line 130");
         }
 
         try(OutputStream requestBody = connection.getOutputStream();) {
@@ -142,13 +146,13 @@ public class TerminalMenus {
         } else {
             // SERVER RETURNED AN HTTP ERROR
             InputStream responseBody = connection.getErrorStream();
-            return new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-            // Read and process error response body from InputStream ...
+            String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
+            throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
         }
     }
 
     public static void errorDisplay(PrintStream out) {
-        out.println("Sorry, your input is not recognisable. Please try again.");
+        //TODO: make it so text is red and bold??
     }
 
     public void doGet(String urlString) throws IOException {
