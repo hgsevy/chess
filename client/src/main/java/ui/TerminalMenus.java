@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import clientAPI.ServerFacade;
 import com.google.gson.Gson;
 import model.GameData;
 import model.UserData;
@@ -19,26 +20,38 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
+
 import static ui.EscapeSequences.*;
 
 public class TerminalMenus {
-    private String authToken = "";
+
     private String username = "";
+    private String authToken = ""; //FIXME: remove once server facade fixed
     private ArrayList<GameData> gameList;
+
+    private ServerFacade server;
+
+
+    public TerminalMenus(int num){
+        server = new ServerFacade(num);
+    }
     public void runThis(){
 
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
+        out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE);
         out.println("Welcome to the chess terminal. Possible commands are listed below");
+        out.print(SET_BG_COLOR_DARK_GREY);
         Scanner scanner = new Scanner(System.in);
         String line = "help";
 
         do{
-            if (authToken.isEmpty()) { // pre-login menu
+            if (!server.isLoggedIn()) { // pre-login menu
                 if (line.contains("register")) {
                     try {
                         register(out, line);
-                    } catch (BadInputException | IOException e1) {
+                    } catch (BadInputException e1) {
                         errorDisplay(out);
                         out.println(e1.getMessage());
                     }
@@ -101,68 +114,48 @@ public class TerminalMenus {
         } while (!line.equals("quit"));
     }
     private static void helpPreLoginDisplay(PrintStream out){
-        out.println("register <USERNAME> <PASSWORD> <EMAIL>: create an account by entering username, password, and email");
-        out.println("login <USERNAME> <PASSWORD>: play chess after entering a valid username and password");
-        out.println("quit: exits the program");
-        out.println("help: displays possible commands and explanations");
+        helpHelper(out, "register", new String[]{"USERNAME", "PASSWORD", "EMAIL"}, "create an account by entering username, password, and email");
+        helpHelper(out, "login", new String[]{"USERNAME", "PASSWORD"}, "play chess after entering a valid username and password");
+        helpHelper(out, "quit", new String[]{}, "exits the program");
+        helpHelper(out, "help", new String[]{}, "displays possible commands and explanations");
         out.println();
     }
 
     private static void helpPostLoginDisplay(PrintStream out){
-        out.println("create <NAME>: create a game by entering the name");
-        out.println("list: list all games");
-        out.println("join <ID> WHITE|BLACK|<empty>: joins a created chess game");
-        out.println("observe <ID>: observe a create chess game");
-        out.println("logout");
-        out.println("quit: exits the program");
-        out.println("help: displays possible commands and explanations");
+        helpHelper(out, "create", new String[]{"NAME"}, "create a game by entering the name");
+        helpHelper(out, "list", new String[]{}, "list all games");
+        helpHelper(out, "join", new String[]{"GAME NUMBER", "WHITE|BLACK|<empty>"}, "joins a created game");
+        helpHelper(out, "observe", new String[]{"GAME NUMBER"}, "observe a created game");
+        helpHelper(out, "logout", new String[]{}, "go back to pre-login menu");
+        helpHelper(out, "quit", new String[]{}, "exits the program");
+        helpHelper(out, "help", new String[]{}, "displays possible commands and explanations");
         out.println();
     }
 
-    private void register(PrintStream out, String command) throws IOException, BadInputException {
+    private static void helpHelper(PrintStream out, String command, String[] arguments, String description){
+        out.print(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE);
+        out.print(command);
+        out.print(RESET_TEXT_BOLD_FAINT);
+        for (String argument:arguments){
+            out.print(" <");
+            out.print(argument);
+            out.print(">");
+        }
+        out.print(": ");
+        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(description);
+        out.println();
+    }
+
+    private void register(PrintStream out, String command) throws BadInputException {
         String[] words = command.split(" ");
         if (words.length != 4){
             errorDisplay(out);
             throw new BadInputException("wrong number of arguments");
         }
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL("http://localhost:8080/user");
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e1){
-            System.out.println("You mistyped the url on line 75");
-            throw new IOException("bad website");
-        }
 
-        connection.setReadTimeout(5000);
-        try {
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-        } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 83");
-        }
-
-        try(OutputStream requestBody = connection.getOutputStream();) {
-            UserData input = new UserData(words[1], words[2], words[3]);
-            requestBody.write((new Gson().toJson(input)).getBytes());
-        } catch (IOException e) {
-            System.out.println("Error on line 90");
-            System.out.println(e.getMessage());
-        }
-
-
-        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            InputStream responseBody = connection.getInputStream();
-            String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-            authToken = new Gson().fromJson(output, LoginResult.class).authToken();
-            username = words[1];
-        } else {
-            // SERVER RETURNED AN HTTP ERROR
-            InputStream responseBody = connection.getErrorStream();
-            String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-            throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-        }
+        server.register(words[1], words[2], words[3]);
+        username = words[1];
     }
 
     private void login(PrintStream out, String command) throws IOException, BadInputException {
@@ -173,79 +166,13 @@ public class TerminalMenus {
             throw new BadInputException("wrong number of arguments");
         }
 
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL("http://localhost:8080/session");
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e1){
-            System.out.println("You mistyped the url on line 121");
-            return;
-        }
-
-        connection.setReadTimeout(5000);
-        try {
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-        } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 130");
-        }
-
-        try(OutputStream requestBody = connection.getOutputStream();) {
-            LoginRequest req = new LoginRequest(words[1], words[2]);
-            requestBody.write((new Gson().toJson(req)).getBytes());
-        } catch (IOException e) {
-            System.out.println("Error on line 79");
-        }
-
-
-        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            InputStream responseBody = connection.getInputStream();
-            String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-            authToken = new Gson().fromJson(output, LoginResult.class).authToken();
-            username = words[1];
-        } else {
-            // SERVER RETURNED AN HTTP ERROR
-            InputStream responseBody = connection.getErrorStream();
-            String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-            throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-        }
+        server.login(words[1], words[2]);
+        username = words[1];
     }
 
     private void logout(PrintStream out) throws BadInputException {
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL("http://localhost:8080/session");
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e1){
-            System.out.println("You mistyped the url on line 121");
-            return;
-        }
-
-        connection.setReadTimeout(5000);
-        try {
-            connection.setRequestMethod("DELETE");
-            connection.setDoOutput(true);
-        } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 130");
-        }
-
-        connection.addRequestProperty("Authorization", authToken);
-
-        try {
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                authToken = "";
-                // Read response body from InputStream ...
-            } else {
-                // SERVER RETURNED AN HTTP ERROR
-                InputStream responseBody = connection.getErrorStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-            }
-        } catch (IOException e1){
-            throw new BadInputException(e1.getMessage());
-        }
+        server.logout();
+        username = null;
     }
 
     private void create(PrintStream out, String command) throws BadInputException {
@@ -260,43 +187,7 @@ public class TerminalMenus {
             throw new BadInputException("wrong number of arguments");
         }
 
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL("http://localhost:8080/game");
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e1){
-            System.out.println("You mistyped the url on line 121");
-            return;
-        }
-
-        connection.setReadTimeout(5000);
-        try {
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-        } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 130");
-        }
-
-        connection.addRequestProperty("Authorization", authToken);
-
-        try(OutputStream requestBody = connection.getOutputStream();) {
-            CreateGameRequest req = new CreateGameRequest(words[1]);
-            requestBody.write((new Gson().toJson(req)).getBytes());
-        } catch (IOException e) {
-            System.out.println("Error on line 79");
-        }
-
-        try {
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                // SERVER RETURNED AN HTTP ERROR
-                InputStream responseBody = connection.getErrorStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-            }
-        } catch (IOException e1){
-            throw new BadInputException(e1.getMessage());
-        }
+        server.create(words[1]);
     }
 
     private void list(PrintStream out) throws BadInputException {
@@ -399,7 +290,7 @@ public class TerminalMenus {
     private void printPrompt(PrintStream out){
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
-        if (authToken.isEmpty()){
+        if (!server.isLoggedIn()){
             out.print("[LOGGED OUT] >>> ");
         } else {
             out.print("[" + username + "] >>> ");

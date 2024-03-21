@@ -20,7 +20,7 @@ public class UserTest {
     public static void main(String[] args) {
         init();
 
-        TerminalMenus thing = new TerminalMenus();
+        TerminalMenus thing = new TerminalMenus(8080);
         thing.runThis();
 
         server.stop();
