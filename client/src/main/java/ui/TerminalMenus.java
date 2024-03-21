@@ -2,32 +2,19 @@ package ui;
 
 import chess.ChessGame;
 import clientAPI.ServerFacade;
-import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
-import model.requestsAndResults.LoginRequest;
-import model.requestsAndResults.LoginResult;
-import model.requestsAndResults.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.ProtocolException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-
 
 import static ui.EscapeSequences.*;
 
 public class TerminalMenus {
 
     private String username = "";
-    private String authToken = ""; //FIXME: remove once server facade fixed
     private ArrayList<GameData> gameList;
 
     private ServerFacade server;
@@ -83,7 +70,7 @@ public class TerminalMenus {
                }
                else if (line.contains("create")){
                    try{
-                       create(out, line);
+                       create(line);
                    } catch (BadInputException e1){
                        errorDisplay(out);
                        out.println(e1.getMessage());
@@ -172,14 +159,11 @@ public class TerminalMenus {
         username = null;
     }
 
-    private void create(PrintStream out, String command) throws BadInputException {
+    private void create(String command) throws BadInputException {
         String[] words = command.split(" ");
         if (words.length > 2){
-            errorDisplay(out);
-            out.println("you had " + (words.length - 1) + " arguments when you should have had 1");
-            throw new BadInputException("wrong number of arguments");
+            throw new BadInputException("you had " + (words.length - 1) + " arguments when you should have had 1");
         } else if (words.length < 2){
-            errorDisplay(out);
             throw new BadInputException("you didn't include a game name");
         }
 
@@ -194,58 +178,29 @@ public class TerminalMenus {
     private void join(PrintStream out, String command) throws BadInputException {
         String[] words = command.split(" ");
         if (words.length > 3){
-            errorDisplay(out);
-            out.println("you had " + (words.length - 1) + " arguments when you should have had 1 or 2");
-            throw new BadInputException("wrong number of arguments");
+            throw new BadInputException("you had " + (words.length - 1) + " arguments when you should have had 1 or 2");
         }
 
-        URL url;
-        HttpURLConnection connection;
-        try {
-            url = new URL("http://localhost:8080/game");
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e1){
-            System.out.println("You mistyped the url on line 348");
-            return;
+        ChessGame.TeamColor color;
+        if (words.length == 2) {
+            color = null;
+        } else if (words[2].equalsIgnoreCase("black")) {
+            color = ChessGame.TeamColor.BLACK;
+        } else if (words[2].equalsIgnoreCase("white")) {
+            color = ChessGame.TeamColor.WHITE;
+        } else {
+            throw new BadInputException("invalid color entered");
         }
 
-        connection.setReadTimeout(5000);
-        try {
-            connection.setRequestMethod("PUT");
-            connection.setDoOutput(true);
-        } catch (ProtocolException e1){
-            System.out.println("You used the wrong HTTP method on line 357");
+        int gameIndex;
+        try{
+            gameIndex = Integer.parseInt(words[1]) - 1;
+        } catch (NumberFormatException e1){
+            throw new BadInputException("game number not entered");
         }
 
-        connection.addRequestProperty("Authorization", authToken);
+        server.join(gameList.get(Integer.parseInt(words[1])-1).gameID(), color);
 
-        try(OutputStream requestBody = connection.getOutputStream();) {
-            ChessGame.TeamColor color;
-            if (words.length == 2){
-                color = null;
-            } else if (words[2].equalsIgnoreCase("black")){
-                color = ChessGame.TeamColor.BLACK;
-            } else if (words[2].equalsIgnoreCase("white")){
-                color = ChessGame.TeamColor.WHITE;
-            } else {
-                throw new BadInputException("invalid color entered");
-            }
-            JoinGameRequest req = new JoinGameRequest(color, gameList.get((Integer.parseInt(words[1]) - 1)).gameID());
-            requestBody.write((new Gson().toJson(req)).getBytes());
-        } catch (IOException e) {
-            System.out.println("Error about line 372");
-        }
-
-        try {
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                // SERVER RETURNED AN HTTP ERROR
-                InputStream responseBody = connection.getErrorStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-            }
-        } catch (IOException e1){
-            throw new BadInputException(e1.getMessage());
-        }
         TerminalBoard.displayStartBoards(out);
     }
 

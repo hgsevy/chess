@@ -1,5 +1,6 @@
 package clientAPI;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import model.UserData;
@@ -181,6 +182,34 @@ public class ServerFacade {
         }
     }
 
+    public void join(int id, ChessGame.TeamColor color) throws BadInputException {
+        URL url;
+        HttpURLConnection connection;
+        try {
+            url = new URL("http://localhost:"+portNum+"/game");
+        } catch (IOException e1){
+            throw new BadInputException("bad url");
+        }
+
+        JoinGameRequest req = new JoinGameRequest(color, id);
+        try{
+            connection = HTTP(url, "PUT", new Gson().toJson(req));
+        } catch (IOException e1){
+            throw new BadInputException("can't connect to server: " + e1.getMessage());
+        }
+
+        try {
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                // SERVER RETURNED AN HTTP ERROR
+                InputStream responseBody = connection.getErrorStream();
+                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
+                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
+            }
+        } catch (IOException e1){
+            throw new BadInputException(e1.getMessage());
+        }
+    }
+
     private HttpURLConnection HTTP(URL url, String method, String req) throws IOException {
         HttpURLConnection connection;
         try {
@@ -205,7 +234,7 @@ public class ServerFacade {
         }
 
         if (!method.equals("GET")) {
-            try (OutputStream requestBody = connection.getOutputStream();) {
+            try (OutputStream requestBody = connection.getOutputStream()) {
                 requestBody.write(req.getBytes());
             } catch (IOException e) {
                 System.out.println("Error on line 210");
