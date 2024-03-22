@@ -195,11 +195,14 @@ public class TerminalMenus {
         int gameIndex;
         try{
             gameIndex = Integer.parseInt(words[1]) - 1;
+            if (gameIndex >= gameList.size()){
+                throw new BadInputException("game number entered is not valid");
+            }
         } catch (NumberFormatException e1){
             throw new BadInputException("game number not entered");
         }
 
-        server.join(gameList.get(Integer.parseInt(words[1])-1).gameID(), color);
+        server.join(gameList.get(gameIndex).gameID(), color);
 
         TerminalBoard.displayStartBoards(out);
     }
@@ -224,6 +227,8 @@ public class TerminalMenus {
     private void displayList(PrintStream out){
         for (int i = 0 ; i < gameList.size(); i++){
             out.println((i+1) + ": " + gameList.get(i).gameName());
+            out.println("\tWhite player: " + gameList.get(i).whiteUsername());
+            out.println("\tBlack player: " + gameList.get(i).blackUsername());
         }
     }
 
