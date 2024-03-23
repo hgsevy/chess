@@ -27,9 +27,9 @@ public class TerminalMenus {
 
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
-        out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE);
+        out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE + SET_TEXT_BOLD);
         out.println("Welcome to the chess terminal. Possible commands are listed below");
-        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_BG_COLOR_DARK_GREY + RESET_TEXT_BOLD_FAINT);
         Scanner scanner = new Scanner(System.in);
         String line = "help";
 
@@ -226,9 +226,24 @@ public class TerminalMenus {
 
     private void displayList(PrintStream out){
         for (int i = 0 ; i < gameList.size(); i++){
+            out.print(SET_TEXT_COLOR_BLUE);
             out.println((i+1) + ": " + gameList.get(i).gameName());
-            out.println("\tWhite player: " + gameList.get(i).whiteUsername());
-            out.println("\tBlack player: " + gameList.get(i).blackUsername());
+            out.print(SET_TEXT_COLOR_WHITE + RESET_TEXT_BOLD_FAINT);
+            out.print("\tWhite player: ");
+            if (gameList.get(i).whiteUsername() == null){
+                out.print(SET_TEXT_COLOR_GREEN);
+                out.println("OPEN TO JOIN");
+                out.print(SET_TEXT_COLOR_WHITE);
+            } else {
+                out.println(gameList.get(i).whiteUsername());
+            }
+            out.print("\tBlack player: ");
+            if (gameList.get(i).blackUsername() == null){
+                out.print(SET_TEXT_COLOR_GREEN);
+                out.println("OPEN TO JOIN");
+            } else {
+                out.println(gameList.get(i).blackUsername());
+            }
         }
     }
 
