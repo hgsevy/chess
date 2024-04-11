@@ -1,8 +1,6 @@
 package dataAccess;
 
 import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
 import model.GameData;
 
 import java.util.ArrayList;

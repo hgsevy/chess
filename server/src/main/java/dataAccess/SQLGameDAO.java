@@ -1,8 +1,6 @@
 package dataAccess;
 
 import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 
