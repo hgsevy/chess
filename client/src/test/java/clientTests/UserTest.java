@@ -17,7 +17,7 @@ public class UserTest {
 
 
     public static void main(String[] args) {
-        init();
+        //init();
 
         TerminalMenus thing = new TerminalMenus(8080);
         thing.runThis();
