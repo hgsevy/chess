@@ -66,7 +66,7 @@ public class SQLGameDAO implements GameDAO{
                 ResultSet rs = selectTableStatement.executeQuery();
                 // make sure game exists
                 if(!rs.next()){
-                    throw new DataAccessException("game does not exist");
+                    throw new DataAccessException("game does not exist 5");
                 }
                 // choose which spot to join
                 if (color == ChessGame.TeamColor.BLACK){
@@ -136,7 +136,7 @@ public class SQLGameDAO implements GameDAO{
                 ResultSet rs = selectTableStatement.executeQuery();
                 // make sure game exists
                 if(!rs.next()){
-                    throw new DataAccessException("game does not exist");
+                    throw new DataAccessException("game does not exist 4");
                 }
                 // choose which spot to join
                 var updateUsers = "UPDATE gameData SET game=? WHERE gameID = ?;";
@@ -154,7 +154,6 @@ public class SQLGameDAO implements GameDAO{
         } catch (SQLException e2){
             System.out.print("SQL gd l 107: " + e2.getMessage());
         }
-        throw new DataAccessException("game does not exist");
     }
 
     public void clear() {

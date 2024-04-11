@@ -118,7 +118,7 @@ public class WebSocketHandler {
         }
         if (gameID == -1){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("game does not exist")));
+                session.getRemote().sendString(new Gson().toJson(new Error("game does not exist 2")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -214,7 +214,7 @@ public class WebSocketHandler {
         }
         if (gameID == -1){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("game does not exist")));
+                session.getRemote().sendString(new Gson().toJson(new Error("game does not exist 3")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");

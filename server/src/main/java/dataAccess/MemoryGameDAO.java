@@ -49,7 +49,7 @@ public class MemoryGameDAO implements GameDAO{
                 throw new DataAccessException("color does not exist");
             }
         }
-        throw new DataAccessException("game does not exist");
+        throw new DataAccessException("game does not exist 1");
 
     }
 
@@ -66,7 +66,7 @@ public class MemoryGameDAO implements GameDAO{
                 return;
             }
         }
-        throw new DataAccessException("game does not exist");
+        throw new DataAccessException("game does not exist 6");
     }
 
     public void clear() {
