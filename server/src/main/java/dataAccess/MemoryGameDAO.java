@@ -1,6 +1,8 @@
 package dataAccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -53,6 +55,18 @@ public class MemoryGameDAO implements GameDAO{
 
     public ArrayList<GameData> listGames() {
         return database;
+    }
+
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException{
+        for(int i = 0; i < database.size(); i++){
+            if(database.get(i).gameID() == gameID){
+                GameData oldData = database.get(i);
+                database.remove(i);
+                database.add(new GameData(oldData.gameID(), oldData.whiteUsername(), oldData.blackUsername(), oldData.gameName(), game));
+                return;
+            }
+        }
+        throw new DataAccessException("game does not exist");
     }
 
     public void clear() {

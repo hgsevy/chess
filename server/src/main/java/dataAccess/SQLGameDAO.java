@@ -1,6 +1,8 @@
 package dataAccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 
@@ -124,6 +126,35 @@ public class SQLGameDAO implements GameDAO{
             System.out.print("SQL gd l 124: " + e.getMessage());
         }
         return answer;
+    }
+
+    public void updateGame(int gameID, ChessGame newGame) throws DataAccessException{
+        try (var conn = getConnection()) {
+            var checkTable = "SELECT blackUsername FROM gameData WHERE gameID=?";
+            try (var selectTableStatement = conn.prepareStatement(checkTable)) {
+                selectTableStatement.setInt(1, gameID);
+                ResultSet rs = selectTableStatement.executeQuery();
+                // make sure game exists
+                if(!rs.next()){
+                    throw new DataAccessException("game does not exist");
+                }
+                // choose which spot to join
+                var updateUsers = "UPDATE gameData SET game=? WHERE gameID = ?;";
+                try (var joinStatement = conn.prepareStatement(updateUsers)) {
+                    joinStatement.setString(1, new Gson().toJson(newGame, ChessGame.class));
+                    joinStatement.setInt(2, gameID);
+                    joinStatement.execute();
+                }
+            }
+        } catch (DataAccessException e1) {
+            if (e1.getMessage().contains("not exist") || e1.getMessage().contains("taken")){
+                throw e1;
+            }
+            System.out.print("DataAccess SQL gd l 105: " + e1.getMessage());
+        } catch (SQLException e2){
+            System.out.print("SQL gd l 107: " + e2.getMessage());
+        }
+        throw new DataAccessException("game does not exist");
     }
 
     public void clear() {

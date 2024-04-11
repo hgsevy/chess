@@ -2,9 +2,12 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -20,22 +23,22 @@ public class TerminalBoard {
 
         ChessGame board = new ChessGame();
 
-        displayBoard(out, board.getBoard().getArray(), false);
+        displayBoard(out, board.getBoard().getArray(), false, null);
         out.print(SET_BG_COLOR_BLACK);
         out.println();
-        displayBoard(out, board.getBoard().getArray(), true);
+        displayBoard(out, board.getBoard().getArray(), true, null);
     }
 
     public static void displayStartBoards(PrintStream out){
         ChessGame board = new ChessGame();
 
-        displayBoard(out, board.getBoard().getArray(), false);
+        displayBoard(out, board.getBoard().getArray(), false, null);
         out.print(SET_BG_COLOR_BLACK);
         out.println();
-        displayBoard(out, board.getBoard().getArray(), true);
+        displayBoard(out, board.getBoard().getArray(), true, null);
     }
 
-    public static void displayBoard(PrintStream out, ChessPiece[][] board, boolean isForBlack){
+    public static void displayBoard(PrintStream out, ChessPiece[][] board, boolean isForBlack, Collection<ChessPosition> toHighlight){
         // draw header
         drawHorizontalBoarder(out, isForBlack);
 
@@ -53,7 +56,7 @@ public class TerminalBoard {
             drawOutsideSquares(out, verticalLabels[i], 1);
             int jCopy = j;
             while (jCopy < 8 && jCopy >= 0){
-                drawSquare(out, board[i][jCopy], (i+jCopy)%2==0);
+                drawSquare(out, board[i][jCopy], (i+jCopy)%2==0, toHighlight!=null && toHighlight.contains(new ChessPosition(i+1, j+1)));
                 jCopy += direction;
             }
             drawOutsideSquares(out, verticalLabels[i], 0);
@@ -96,12 +99,20 @@ public class TerminalBoard {
         out.print("\u200A".repeat(5-leftSide));
     }
 
-    private static void drawSquare(PrintStream out, ChessPiece piece, boolean squareIsBlack){
+    private static void drawSquare(PrintStream out, ChessPiece piece, boolean squareIsBlack, boolean highlight){
         if (squareIsBlack) {
-            out.print(SET_BG_COLOR_BLACK);
+            if (highlight){
+                out.print(SET_BG_COLOR_DARK_GREEN);
+            } else {
+                out.print(SET_BG_COLOR_BLACK);
+            }
         }
         else {
-            out.print(SET_BG_COLOR_WHITE);
+            if (highlight){
+                out.print(SET_BG_COLOR_GREEN);
+            } else {
+                out.print(SET_BG_COLOR_WHITE);
+            }
         }
         out.print(SQUARE_SPACE);
         if (piece == null){

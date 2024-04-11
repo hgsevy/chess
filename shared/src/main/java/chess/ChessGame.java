@@ -23,6 +23,7 @@ public class ChessGame {
     private boolean blackLeftRookMoved;
     private boolean blackRightRookMoved;
     private ChessMove lastMove;
+    private boolean isOver;
 
 
     public ChessGame() {
@@ -35,6 +36,7 @@ public class ChessGame {
         blackKingMoved = false;
         blackLeftRookMoved = false;
         blackRightRookMoved = false;
+        isOver = false;
     }
 
     /**
@@ -228,10 +230,10 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (board.getPiece(move.start()) == null){
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("there is no piece at the given location");
         }
         if (board.getPiece(move.start()).getTeamColor() != turn){
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("it is not your turn");
         }
         Collection<ChessMove> possibilities = validMoves(move.start());
         for (ChessMove possibleMove : possibilities){
@@ -252,7 +254,7 @@ public class ChessGame {
                 return;
             }
         }
-        throw new InvalidMoveException();
+        throw new InvalidMoveException("move is not valid per standard chess rules");
     }
 
     /**
@@ -450,5 +452,11 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public boolean isOver(){return isOver;}
+
+    public void endGame(){
+        isOver = true;
     }
 }

@@ -219,7 +219,6 @@ public class TerminalMenus {
     }
 
     private static void errorDisplay(PrintStream out) {
-        //TODO: make it so text is red and bold??
         out.print(SET_BG_COLOR_RED);
         out.print(SET_TEXT_COLOR_WHITE);
     }
