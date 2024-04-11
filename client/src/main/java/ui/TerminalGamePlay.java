@@ -89,13 +89,13 @@ public class TerminalGamePlay {
     public void displayError(String error){
         out.println();
         errorDisplay(out);
-        out.print(error);
+        out.println(error);
         printPrompt(out);
     }
 
     public void displayNotification(String notification){
         out.println();
-        out.print(notification);
+        out.println(notification);
         printPrompt(out);
     }
 

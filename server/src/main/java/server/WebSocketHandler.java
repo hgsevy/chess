@@ -9,7 +9,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
 import service.exceptions.UnauthorizedException;
-import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
@@ -108,7 +108,7 @@ public class WebSocketHandler {
                     color = gameService.getPlayerColor(userService.getUsername(token), gameID);
                 } catch (UnauthorizedException e1){
                     try {
-                        session.getRemote().sendString(new Gson().toJson(new Error("you do not have access to chess")));
+                        session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you do not have access to chess")));
                         return;
                     } catch (IOException e2){
                         System.out.println("bad session l 108");
@@ -118,7 +118,7 @@ public class WebSocketHandler {
         }
         if (gameID == -1){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("game does not exist 2")));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("game does not exist 2")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -127,7 +127,7 @@ public class WebSocketHandler {
 
         if (color == null){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("you are not a player in this game")));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you are not a player in this game")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -138,7 +138,7 @@ public class WebSocketHandler {
 
         if (game.getBoard().getPiece(req.getMove().start()) != null && game.getBoard().getPiece(req.getMove().start()).getTeamColor() != color){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("that piece does not belong to you")));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("that piece does not belong to you")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -149,7 +149,7 @@ public class WebSocketHandler {
             game.makeMove(req.getMove());
         } catch (InvalidMoveException e1){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error(e1.getMessage())));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e1.getMessage())));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -177,7 +177,7 @@ public class WebSocketHandler {
         }
         if (toRemove == null){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("somehow you were never here")));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("somehow you were never here")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -204,7 +204,7 @@ public class WebSocketHandler {
                     color = gameService.getPlayerColor(userService.getUsername(token), gameID);
                 } catch (UnauthorizedException e1){
                     try {
-                        session.getRemote().sendString(new Gson().toJson(new Error("you do not have access to chess")));
+                        session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you do not have access to chess")));
                         return;
                     } catch (IOException e2){
                         System.out.println("bad session l 108");
@@ -214,7 +214,7 @@ public class WebSocketHandler {
         }
         if (gameID == -1){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("game does not exist 3")));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("game does not exist 3")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
@@ -223,7 +223,7 @@ public class WebSocketHandler {
 
         if (color == null){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("you are not a player in this game")));
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you are not a player in this game")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
