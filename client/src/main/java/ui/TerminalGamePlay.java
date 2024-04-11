@@ -120,8 +120,10 @@ public class TerminalGamePlay {
         }
         Collection<ChessMove> moves = game.validMoves(new ChessPosition(Integer.parseInt(words[2]), convertLetterToCol(words[1])));
         Collection<ChessPosition> ends = new HashSet<>();
-        for (ChessMove move : moves){
-            ends.add(move.end());
+        if (moves != null) {
+            for (ChessMove move : moves) {
+                ends.add(move.end());
+            }
         }
         TerminalBoard.displayBoard(out, game.getBoard().getArray(), color!=null && color == ChessGame.TeamColor.BLACK, ends);
     }
@@ -141,7 +143,7 @@ public class TerminalGamePlay {
         } catch (NumberFormatException e1){
             throw new BadInputException("invalid row input");
         }
-        ChessMove move = new ChessMove(new ChessPosition(convertLetterToCol(words[1]), Integer.parseInt(words[2])), new ChessPosition(convertLetterToCol(words[3]), Integer.parseInt(words[4])), null);
+        ChessMove move = new ChessMove(new ChessPosition(Integer.parseInt(words[2]), convertLetterToCol(words[1])), new ChessPosition(Integer.parseInt(words[4]), convertLetterToCol(words[3])), null);
         try {
             ws.makeMove(move);
         } catch (Exception e1){

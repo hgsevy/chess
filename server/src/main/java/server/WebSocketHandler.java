@@ -138,7 +138,7 @@ public class WebSocketHandler {
 
         if (game.getBoard().getPiece(req.getMove().start()) != null && game.getBoard().getPiece(req.getMove().start()).getTeamColor() != color){
             try {
-                session.getRemote().sendString(new Gson().toJson(new Error("that piece doe not belong to you")));
+                session.getRemote().sendString(new Gson().toJson(new Error("that piece does not belong to you")));
                 return;
             } catch (IOException e2){
                 System.out.println("bad session l 108");
