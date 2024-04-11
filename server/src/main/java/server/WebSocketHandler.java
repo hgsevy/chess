@@ -62,7 +62,7 @@ public class WebSocketHandler {
             return;
         }
         var notification = new Notification(message);
-        broadcast(req.getGameID(), new Gson().toJson(notification));
+        broadcast(req.getGameID(), new Gson().toJson(notification), session);
 
         connections.add(new SessionInfo(token, req.getGameID(), session));
         var loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
@@ -84,7 +84,7 @@ public class WebSocketHandler {
             return;
         }
         var notification = new Notification(message);
-        broadcast(req.getGameID(), new Gson().toJson(notification));
+        broadcast(req.getGameID(), new Gson().toJson(notification), session);
 
         connections.add(new SessionInfo(token, req.getGameID(), session));
 
@@ -159,9 +159,9 @@ public class WebSocketHandler {
         gameService.updateGame(gameID, game);
         try {
             var notification = new Notification(userService.getUsername(token) + " just moved from " + req.getMove().getStartPosition() + " to " + req.getMove().getEndPosition());
-            broadcast(gameID, new Gson().toJson(notification));
+            broadcast(gameID, new Gson().toJson(notification), session);
             var gameNot = new LoadGame(game);
-            broadcast(gameID, new Gson().toJson(gameNot));
+            broadcast(gameID, new Gson().toJson(gameNot), null);
         } catch (UnauthorizedException e1){
             System.out.println("how the heck did I get this far unauthorized?? (line 166)");
         }
@@ -187,7 +187,7 @@ public class WebSocketHandler {
         connections.remove(toRemove);
         try {
             var notification = new Notification(userService.getUsername(token) + " just left the game");
-            broadcast(req.getGameID(), new Gson().toJson(notification));
+            broadcast(req.getGameID(), new Gson().toJson(notification), session);
         } catch (UnauthorizedException e1){
             System.out.println("how the heck did I get this far unauthorized?? (line 166)");
         }
@@ -237,7 +237,7 @@ public class WebSocketHandler {
         gameService.updateGame(gameID, game);
         try {
             var notification = new Notification(userService.getUsername(token) + " just resigned from this game. It is now over");
-            broadcast(gameID, new Gson().toJson(notification));
+            broadcast(gameID, new Gson().toJson(notification), null);
         } catch (UnauthorizedException e1){
             System.out.println("how the heck did I get this far unauthorized?? (line 166)");
         }
@@ -246,9 +246,9 @@ public class WebSocketHandler {
 
 
 
-    private void broadcast(int gameID, String notification) {
+    private void broadcast(int gameID, String notification, Session root) {
         for (SessionInfo session : connections){
-            if (session.gameID == gameID) {
+            if (session.gameID == gameID && !session.session.equals(root)) {
                 try {
                     session.session.getRemote().sendString(notification);
                 } catch (IOException e1) {
