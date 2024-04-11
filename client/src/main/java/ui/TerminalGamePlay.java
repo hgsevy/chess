@@ -85,6 +85,21 @@ public class TerminalGamePlay {
         out.println();
     }
 
+    //These are the functions used by the notification helper
+    public void displayError(String error){
+        errorDisplay(out);
+        out.print(error);
+    }
+
+    public void displayNotification(String notification){
+        out.print(notification);
+    }
+
+    public void loadGame(ChessGame game){
+        this.game = game;
+        TerminalBoard.displayBoard(out, game.getBoard().getArray(), color!=null && color == ChessGame.TeamColor.BLACK,null);
+    }
+
     private void highlight(String line) throws BadInputException {
         String[] words = line.split(" ");
         if (words.length != 3){

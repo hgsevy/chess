@@ -1,7 +1,21 @@
 package clientAPI;
 
+import com.google.gson.Gson;
+import ui.TerminalGamePlay;
+import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.ServerMessage;
 
-public interface NotificationHandler {
-    void notify(ServerMessage message);
+public class NotificationHandler {
+    private TerminalGamePlay terminal;
+    public NotificationHandler (TerminalGamePlay terminal){
+        this.terminal = terminal;
+    }
+    void notify(String message){
+        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+        switch(serverMessage.getServerMessageType()){
+            case NOTIFICATION -> terminal.displayNotification(new Gson().fromJson(message, Error.class).getMessage());
+            case ERROR -> terminal.displayError(new Gson().fromJson(message, Error.class).getMessage());
+            case LOAD_GAME -> terminal.loadGame(new Gson().fromJson(message, LoadGame.class).getGame());
+        }
+    }
 }

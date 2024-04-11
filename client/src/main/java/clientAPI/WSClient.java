@@ -3,6 +3,7 @@ package clientAPI;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
@@ -13,18 +14,21 @@ public class WSClient extends Endpoint {
     public Session session;
     private final String authToken;
     private final int gameID;
+    private NotificationHandler notificationHandler;
 
-    public WSClient(int portNum, String authToken, int gameID) throws Exception {
+    public WSClient(int portNum, String authToken, int gameID, NotificationHandler nh) throws Exception {
         this.authToken = authToken;
         this.gameID = gameID;
+        this.notificationHandler = nh;
 
         URI uri = new URI("ws://localhost:"+portNum+"/connect");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            @Override
             public void onMessage(String message) {
-                System.out.println(message);
+                notificationHandler.notify(message);
             }
         });
     }
@@ -58,6 +62,7 @@ public class WSClient extends Endpoint {
         this.session.getBasicRemote().sendText(msg);
     }
 
+    @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 }
