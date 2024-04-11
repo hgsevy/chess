@@ -47,8 +47,6 @@ public class WebSocketHandler {
     }
 
     private void joinPlayer(String token, JoinPlayer req, Session session){
-        connections.add(new SessionInfo(token, req.getGameID(), session));
-
         String message;
         try {
             message = userService.getUsername(token) + " has now joined the game as ";
@@ -65,11 +63,18 @@ public class WebSocketHandler {
         }
         var notification = new Notification(message);
         broadcast(req.getGameID(), new Gson().toJson(notification));
+
+        connections.add(new SessionInfo(token, req.getGameID(), session));
+        var loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
+        try {
+            session.getRemote().sendString(new Gson().toJson(loadNotify));
+        } catch (IOException e1) {
+            System.out.print(e1.getMessage());
+        }
+
     }
 
     private void joinObserver(String token, JoinObserver req, Session session){
-        connections.add(new SessionInfo(token, req.getGameID(), session));
-
         String message;
         try {
             message = userService.getUsername(token) + " is now observing the game";
@@ -80,6 +85,15 @@ public class WebSocketHandler {
         }
         var notification = new Notification(message);
         broadcast(req.getGameID(), new Gson().toJson(notification));
+
+        connections.add(new SessionInfo(token, req.getGameID(), session));
+
+        var loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
+        try {
+            session.getRemote().sendString(new Gson().toJson(loadNotify));
+        } catch (IOException e1) {
+            System.out.print(e1.getMessage());
+        }
 
     }
 
