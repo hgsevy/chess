@@ -14,12 +14,14 @@ public class WSClient extends Endpoint {
     public Session session;
     private final String authToken;
     private final int gameID;
+    private ChessGame.TeamColor color;
+    private ChessGame game;
     private NotificationHandler notificationHandler;
 
-    public WSClient(int portNum, String authToken, int gameID, NotificationHandler nh) throws Exception {
+    public WSClient(int portNum, String authToken, int gameID, NotificationHandler notificationHandler) throws Exception {
         this.authToken = authToken;
         this.gameID = gameID;
-        this.notificationHandler = nh;
+        this.notificationHandler = notificationHandler;
 
         URI uri = new URI("ws://localhost:"+portNum+"/connect");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();

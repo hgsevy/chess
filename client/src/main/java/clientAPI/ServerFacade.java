@@ -21,9 +21,11 @@ public class ServerFacade {
     int portNum;
 
     private String authToken = "";
+    private NotificationHandler notificationHandler;
 
-    public ServerFacade(int portNum) {
+    public ServerFacade(int portNum, NotificationHandler notificationHandler) {
         this.portNum = portNum;
+        this.notificationHandler = notificationHandler;
     }
 
     public void register(String username, String password, String email) throws BadInputException {
@@ -209,7 +211,7 @@ public class ServerFacade {
             throw new BadInputException(e1.getMessage());
         }
         try {
-            return new WSClient(portNum, authToken, req.gameID());
+            return new WSClient(portNum, authToken, req.gameID(), notificationHandler);
         } catch (Exception e1){
             throw new BadInputException("couldn't websocket because " + e1.getMessage());
         }

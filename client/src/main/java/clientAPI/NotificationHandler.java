@@ -1,13 +1,19 @@
 package clientAPI;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import ui.TerminalGamePlay;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.ServerMessage;
 
+import java.io.PrintStream;
+
 public class NotificationHandler {
     private TerminalGamePlay terminal;
-    public NotificationHandler (TerminalGamePlay terminal){
+    public NotificationHandler (){
+    }
+
+    public void addTerminal(TerminalGamePlay terminal){
         this.terminal = terminal;
     }
     void notify(String message){

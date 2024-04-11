@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import clientAPI.NotificationHandler;
 import clientAPI.ServerFacade;
 import clientAPI.WSClient;
 import model.GameData;
@@ -19,10 +20,12 @@ public class TerminalMenus {
     private ArrayList<GameData> gameList;
 
     private ServerFacade server;
+    private NotificationHandler notificationHandler;
 
 
     public TerminalMenus(int num){
-        server = new ServerFacade(num);
+        notificationHandler = new NotificationHandler();
+        server = new ServerFacade(num, notificationHandler);
     }
     public void runThis(){
 
@@ -205,6 +208,7 @@ public class TerminalMenus {
 
         WSClient ws = server.join(gameList.get(gameIndex).gameID(), color);
         TerminalGamePlay gamePlay = new TerminalGamePlay(out, color, ws);
+        notificationHandler.addTerminal(gamePlay);
         gamePlay.runThis();
     }
 
