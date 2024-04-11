@@ -56,7 +56,7 @@ public class TerminalBoard {
             drawOutsideSquares(out, verticalLabels[i], 1);
             int jCopy = j;
             while (jCopy < 8 && jCopy >= 0){
-                drawSquare(out, board[i][jCopy], (i+jCopy)%2==0, toHighlight!=null && toHighlight.contains(new ChessPosition(i+1, j+1)));
+                drawSquare(out, board[i][jCopy], (i+jCopy)%2==0, toHighlight!=null && toHighlight.contains(new ChessPosition(i+1, jCopy+1)));
                 jCopy += direction;
             }
             drawOutsideSquares(out, verticalLabels[i], 0);

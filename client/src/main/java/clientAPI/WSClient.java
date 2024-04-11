@@ -56,8 +56,12 @@ public class WSClient extends Endpoint {
     }
 
     public void joinPlayer(ChessGame.TeamColor color) throws Exception {
-        JoinPlayer req = new JoinPlayer(authToken, gameID, color);
-        send(new Gson().toJson(req));
+        if (color == null) {
+            joinObserver();
+        } else {
+            JoinPlayer req = new JoinPlayer(authToken, gameID, color);
+            send(new Gson().toJson(req));
+        }
     }
 
     public void send(String msg) throws Exception {

@@ -1,6 +1,7 @@
 package clientTests;
 
 import chess.ChessGame;
+import clientAPI.NotificationHandler;
 import clientAPI.ServerFacade;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -19,7 +20,8 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
-        thing = new ServerFacade(port);
+
+        thing = new ServerFacade(port, new NotificationHandler());
     }
 
     @AfterEach

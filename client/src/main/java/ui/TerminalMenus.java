@@ -209,6 +209,11 @@ public class TerminalMenus {
         WSClient ws = server.join(gameList.get(gameIndex).gameID(), color);
         TerminalGamePlay gamePlay = new TerminalGamePlay(out, color, ws);
         notificationHandler.addTerminal(gamePlay);
+        try {
+            ws.joinPlayer(color);
+        } catch (Exception e1){
+            out.println("That annoying exception actually does something? (l 215)");
+        }
         gamePlay.runThis();
     }
 

@@ -37,31 +37,31 @@ public class TerminalGamePlay {
         do{
             if (line.contains("help")) {
                 helpDisplay();
-            } else if (line.contains("redraw")) {
+            } else if (line.equals("redraw")) {
                 TerminalBoard.displayBoard(out, game.getBoard().getArray(), color != null && color == ChessGame.TeamColor.BLACK, null);
-            } else if (line.equals("highlight")) {
+            } else if (line.contains("highlight")) {
                 try {
                     highlight(line);
                 } catch (BadInputException e1) {
                     errorDisplay(out);
                     out.println(e1.getMessage());
                 }
-            }
-            if (color != null && !game.isOver()) { // not an observer
+            } else if (color != null && (game == null || !game.isOver())) { // not an observer
                 if (line.contains("move")) {
                     try {
                         makeMove(line);
-                    } catch (BadInputException|InvalidMoveException e1) {
+                    } catch (BadInputException | InvalidMoveException e1) {
                         errorDisplay(out);
                         out.println(e1.getMessage());
                     }
                 } else if (line.contains("resign")) {
                     resign();
-                } else {
-                    errorDisplay(out);
-                    out.println("Unrecognised command");
                 }
+            } else {
+                errorDisplay(out);
+                out.println("Unrecognised command");
             }
+
             printPrompt(out);
             line = scanner.nextLine();
         } while (!line.equals("leave"));
@@ -76,7 +76,7 @@ public class TerminalGamePlay {
         helpHelper(out, "help", new String[]{}, "displays possible commands and explanations");
         helpHelper(out, "redraw", new String[]{}, "redraws the chess board");
         helpHelper(out, "leave", new String[]{}, "exits gameplay and returns to post-login menu");
-        if (color!=null && !game.isOver()){
+        if (color!=null && (game==null||!game.isOver())){
             helpHelper(out, "move", new String[]{"START COL (letter)", "START ROW (num)", "END COL (letter)", "END ROW (num)"}, "moves the piece at the given start position to the given end position if valid");
             helpHelper(out, "resign", new String[]{}, "forfeits the game and exists gameplay");
         }
@@ -87,17 +87,23 @@ public class TerminalGamePlay {
 
     //These are the functions used by the notification helper
     public void displayError(String error){
+        out.println();
         errorDisplay(out);
         out.print(error);
+        printPrompt(out);
     }
 
     public void displayNotification(String notification){
+        out.println();
         out.print(notification);
+        printPrompt(out);
     }
 
     public void loadGame(ChessGame game){
+        out.println();
         this.game = game;
         TerminalBoard.displayBoard(out, game.getBoard().getArray(), color!=null && color == ChessGame.TeamColor.BLACK,null);
+        printPrompt(out);
     }
 
     private void highlight(String line) throws BadInputException {
@@ -117,7 +123,7 @@ public class TerminalGamePlay {
         for (ChessMove move : moves){
             ends.add(move.end());
         }
-        TerminalBoard.displayBoard(out, game.getBoard().getArray(), true, ends);
+        TerminalBoard.displayBoard(out, game.getBoard().getArray(), color!=null && color == ChessGame.TeamColor.BLACK, ends);
     }
 
     private void makeMove(String line) throws BadInputException, InvalidMoveException {
