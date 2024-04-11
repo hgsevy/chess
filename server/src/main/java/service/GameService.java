@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
@@ -10,6 +11,7 @@ import service.exceptions.UnauthorizedException;
 import model.requestsAndResults.JoinGameRequest;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class GameService {
 
@@ -57,4 +59,39 @@ public class GameService {
         }
         return gameData.createGame(gameName);
     }
+
+    public ChessGame.TeamColor getPlayerColor(String username, int gameID){
+        ArrayList<GameData> list = gameData.listGames();
+        for (GameData data : list){
+            if (data.gameID() == gameID){
+                if (data.whiteUsername().equals(username)){
+                    return ChessGame.TeamColor.WHITE;
+                }
+                else if (data.blackUsername().equals(username)){
+                    return ChessGame.TeamColor.BLACK;
+                }
+                else {return null;}
+            }
+        }
+        return null;
+    }
+
+    public ChessGame getGame(int gameID){
+        ArrayList<GameData> list = gameData.listGames();
+        for (GameData data : list){
+            if (data.gameID() == gameID){
+                return data.game();
+            }
+        }
+        return null;
+    }
+
+    public void updateGame(int gameID, ChessGame newGame){
+        try {
+            gameData.updateGame(gameID, newGame);
+        } catch (DataAccessException e1){
+            System.out.println(e1.getMessage());
+        }
+    }
+
 }

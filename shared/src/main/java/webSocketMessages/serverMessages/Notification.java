@@ -3,13 +3,10 @@ package webSocketMessages.serverMessages;
 public class Notification extends ServerMessage{
     String message;
 
-    public Notification(ServerMessageType type, String message, String message1) {
-        super(type, message);
-        this.message = message1;
-        serverMessageType = ServerMessageType.NOTIFICATION;
+    public Notification(String message) {
+        super(ServerMessageType.NOTIFICATION);
+        this.message = message;
     }
-
-    @Override
     public String getMessage() {
         return message;
     }

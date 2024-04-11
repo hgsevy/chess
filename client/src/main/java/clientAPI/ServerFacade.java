@@ -182,7 +182,7 @@ public class ServerFacade {
         }
     }
 
-    public void join(int id, ChessGame.TeamColor color) throws BadInputException {
+    public WSClient join(int id, ChessGame.TeamColor color) throws BadInputException {
         URL url;
         HttpURLConnection connection;
         try {
@@ -207,6 +207,11 @@ public class ServerFacade {
             }
         } catch (IOException e1){
             throw new BadInputException(e1.getMessage());
+        }
+        try {
+            return new WSClient(portNum, authToken, req.gameID());
+        } catch (Exception e1){
+            throw new BadInputException("couldn't websocket because " + e1.getMessage());
         }
     }
 

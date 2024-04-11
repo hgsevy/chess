@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import clientAPI.ServerFacade;
+import clientAPI.WSClient;
 import model.GameData;
 
 import java.io.PrintStream;
@@ -202,9 +203,9 @@ public class TerminalMenus {
             throw new BadInputException("game number not entered");
         }
 
-        server.join(gameList.get(gameIndex).gameID(), color);
-
-        TerminalBoard.displayStartBoards(out);
+        WSClient ws = server.join(gameList.get(gameIndex).gameID(), color);
+        TerminalGamePlay gamePlay = new TerminalGamePlay(out, color, ws);
+        gamePlay.runThis();
     }
 
     private void printPrompt(PrintStream out){

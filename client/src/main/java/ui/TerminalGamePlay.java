@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import chess.InvalidMoveException;
+import clientAPI.WSClient;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -15,19 +16,18 @@ import static ui.EscapeSequences.RESET_TEXT_BOLD_FAINT;
 
 public class TerminalGamePlay {
     private final ChessGame.TeamColor color;
-    private String authToken;
-    private int gameID;
     private ChessGame game;
     private final PrintStream out;
 
-    public TerminalGamePlay(PrintStream out, String authToken, int gameID, ChessGame.TeamColor color){
+    private WSClient ws;
+
+    public TerminalGamePlay(PrintStream out, ChessGame.TeamColor color, WSClient ws){
         this.out = out;
-        this.authToken = authToken;
         this.color = color;
-        this.gameID = gameID;
+        this.ws = ws;
     }
 
-    public void runThis(PrintStream out){
+    public void runThis(){
         out.print(ERASE_SCREEN);
         out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE + SET_TEXT_BOLD);
         out.println("Welcome to the game"); //TODO: can make it say game name?
@@ -65,6 +65,11 @@ public class TerminalGamePlay {
             printPrompt(out);
             line = scanner.nextLine();
         } while (!line.equals("leave"));
+        try{
+            ws.leave();
+        } catch (Exception e1){
+            out.print("Trouble removing websocket connection");
+        }
     }
 
     private void helpDisplay(){
@@ -76,8 +81,6 @@ public class TerminalGamePlay {
             helpHelper(out, "resign", new String[]{}, "forfeits the game and exists gameplay");
         }
         helpHelper(out, "highlight", new String[]{"COL (letter)", "ROW (num)"}, "draws the board with all possible end positions for the piece at the given start position highlighted");
-
-
 
         out.println();
     }
@@ -118,10 +121,11 @@ public class TerminalGamePlay {
             throw new BadInputException("invalid row input");
         }
         ChessMove move = new ChessMove(new ChessPosition(convertLetterToCol(words[1]), Integer.parseInt(words[2])), new ChessPosition(convertLetterToCol(words[3]), Integer.parseInt(words[4])), null);
-        if (game.getBoard().getPiece(move.start()) != null && game.getBoard().getPiece(move.start()).getTeamColor() != color){
-            throw new InvalidMoveException("this piece does not belong to you");
+        try {
+            ws.makeMove(move);
+        } catch (Exception e1){
+            System.out.print("exception line 126");
         }
-        game.makeMove(move);
     }
 
     private void resign(){
@@ -129,8 +133,12 @@ public class TerminalGamePlay {
         printPrompt(out);
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
-        if (line.equals("Yes")){
-            game.endGame();
+        if (line.equals("Yes")) {
+            try {
+                ws.resign();
+            } catch (Exception e1) {
+                System.out.print("exception line 139");
+            }
         }
     }
 

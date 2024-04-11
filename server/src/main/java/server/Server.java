@@ -20,6 +20,8 @@ public class Server {
     UserService userService;
     GameService gameService;
 
+    private final WebSocketHandler webSocketHandler;
+
     public Server() {
         UserDAO userData;
         GameDAO gameData;
@@ -39,12 +41,16 @@ public class Server {
         clearService = new ClearService(userData, authData, gameData);
         userService = new UserService(userData, authData);
         gameService = new GameService(authData, gameData);
+
+        webSocketHandler = new WebSocketHandler(userService, gameService);
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/connect", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         //clear
@@ -135,8 +141,6 @@ public class Server {
         resp.status(200);
         return new Gson().toJson(new MessageResponse(""));
     }
-
-    // spark.exception
 
 
 }

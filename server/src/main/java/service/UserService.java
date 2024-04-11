@@ -58,4 +58,12 @@ public class UserService {
             throw new UnauthorizedException();
         }
     }
+
+    public String getUsername(String token) throws UnauthorizedException {
+        try {
+            return authData.getUsername(token);
+        } catch (DataAccessException expt1) {
+            throw new UnauthorizedException();
+        }
+    }
 }
