@@ -14,11 +14,11 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.RESET_TEXT_BOLD_FAINT;
 
 public class TerminalGamePlay {
-    private ChessGame.TeamColor color;
+    private final ChessGame.TeamColor color;
     private String authToken;
     private int gameID;
     private ChessGame game;
-    private PrintStream out;
+    private final PrintStream out;
 
     public TerminalGamePlay(PrintStream out, String authToken, int gameID, ChessGame.TeamColor color){
         this.out = out;
@@ -56,8 +56,7 @@ public class TerminalGamePlay {
                         out.println(e1.getMessage());
                     }
                 } else if (line.contains("resign")) {
-                    resign(line);
-
+                    resign();
                 } else {
                     errorDisplay(out);
                     out.println("Unrecognised command");
