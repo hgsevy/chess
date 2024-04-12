@@ -123,7 +123,7 @@ public class TerminalMenus {
         out.println();
     }
 
-    private static void helpHelper(PrintStream out, String command, String[] arguments, String description){
+    public static void helpHelper(PrintStream out, String command, String[] arguments, String description){
         out.print(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE);
         out.print(command);
         out.print(RESET_TEXT_BOLD_FAINT);
@@ -214,7 +214,7 @@ public class TerminalMenus {
         } catch (Exception e1){
             out.println("That annoying exception actually does something? (l 215)");
         }
-        gamePlay.runThis();
+        gamePlay.runThis(gameList.get(gameIndex).gameName());
     }
 
     private void printPrompt(PrintStream out){
@@ -228,7 +228,7 @@ public class TerminalMenus {
         out.flush();
     }
 
-    private static void errorDisplay(PrintStream out) {
+    public static void errorDisplay(PrintStream out) {
         out.print(SET_BG_COLOR_RED);
         out.print(SET_TEXT_COLOR_WHITE);
     }

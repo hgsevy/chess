@@ -229,6 +229,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (isOver){
+            throw new InvalidMoveException("you cannot move because the game is over");
+        }
         if (board.getPiece(move.start()) == null){
             throw new InvalidMoveException("there is no piece at the given location");
         }

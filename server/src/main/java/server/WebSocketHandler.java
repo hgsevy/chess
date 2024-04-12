@@ -244,8 +244,6 @@ public class WebSocketHandler {
 
     }
 
-
-
     private void broadcast(int gameID, String notification, Session root) {
         for (SessionInfo session : connections){
             if (session.gameID == gameID && !session.session.equals(root)) {

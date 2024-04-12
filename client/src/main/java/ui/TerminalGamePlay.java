@@ -27,10 +27,11 @@ public class TerminalGamePlay {
         this.ws = ws;
     }
 
-    public void runThis(){
+    public void runThis(String gameName){
         out.print(ERASE_SCREEN);
+        out.println();
         out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE + SET_TEXT_BOLD);
-        out.println("Welcome to the game"); //TODO: can make it say game name?
+        out.println("Welcome to the game: " + gameName);
         out.print(SET_BG_COLOR_DARK_GREY + RESET_TEXT_BOLD_FAINT);
         Scanner scanner = new Scanner(System.in);
         String line = "help";
@@ -43,7 +44,7 @@ public class TerminalGamePlay {
                 try {
                     highlight(line);
                 } catch (BadInputException e1) {
-                    errorDisplay(out);
+                    TerminalMenus.errorDisplay(out);
                     out.println(e1.getMessage());
                 }
             } else if (color != null && (game == null || !game.isOver())) { // not an observer
@@ -51,14 +52,14 @@ public class TerminalGamePlay {
                     try {
                         makeMove(line);
                     } catch (BadInputException | InvalidMoveException e1) {
-                        errorDisplay(out);
+                        TerminalMenus.errorDisplay(out);
                         out.println(e1.getMessage());
                     }
                 } else if (line.contains("resign")) {
                     resign();
                 }
             } else {
-                errorDisplay(out);
+                TerminalMenus.errorDisplay(out);
                 out.println("Unrecognised command");
             }
 
@@ -73,22 +74,20 @@ public class TerminalGamePlay {
     }
 
     private void helpDisplay(){
-        helpHelper(out, "help", new String[]{}, "displays possible commands and explanations");
-        helpHelper(out, "redraw", new String[]{}, "redraws the chess board");
-        helpHelper(out, "leave", new String[]{}, "exits gameplay and returns to post-login menu");
+        TerminalMenus.helpHelper(out, "help", new String[]{}, "displays possible commands and explanations");
+        TerminalMenus.helpHelper(out, "redraw", new String[]{}, "redraws the chess board");
+        TerminalMenus.helpHelper(out, "leave", new String[]{}, "exits gameplay and returns to post-login menu");
         if (color!=null && (game==null||!game.isOver())){
-            helpHelper(out, "move", new String[]{"START COL (letter)", "START ROW (num)", "END COL (letter)", "END ROW (num)"}, "moves the piece at the given start position to the given end position if valid");
-            helpHelper(out, "resign", new String[]{}, "forfeits the game and exists gameplay");
+            TerminalMenus.helpHelper(out, "move", new String[]{"START", "END"}, "moves the piece at the given start position to the given end position if valid");
+            TerminalMenus.helpHelper(out, "resign", new String[]{}, "forfeits the game and exists gameplay");
         }
-        helpHelper(out, "highlight", new String[]{"COL (letter)", "ROW (num)"}, "draws the board with all possible end positions for the piece at the given start position highlighted");
-
-        out.println();
+        TerminalMenus.helpHelper(out, "highlight", new String[]{"POS (letter, number)"}, "draws the board with all possible end positions for the piece at the given start position highlighted");
     }
 
     //These are the functions used by the notification helper
     public void displayError(String error){
         out.println();
-        errorDisplay(out);
+        TerminalMenus.errorDisplay(out);
         out.println(error);
         printPrompt(out);
     }
@@ -108,17 +107,17 @@ public class TerminalGamePlay {
 
     private void highlight(String line) throws BadInputException {
         String[] words = line.split(" ");
-        if (words.length != 3){
-            throw new BadInputException("invalid entry (hint: need space between row and col)");
+        if (words.length != 2){
+            throw new BadInputException("invalid entry");
         }
         try{
-            if(Integer.parseInt(words[2]) > 8 || Integer.parseInt(words[2]) < 1){
+            if(Integer.parseInt(words[1].substring(1)) > 8 || Integer.parseInt(words[1].substring(1)) < 1){
                 throw new BadInputException("invalid row input");
             }
         } catch (NumberFormatException e1){
             throw new BadInputException("invalid row input");
         }
-        Collection<ChessMove> moves = game.validMoves(new ChessPosition(Integer.parseInt(words[2]), convertLetterToCol(words[1])));
+        Collection<ChessMove> moves = game.validMoves(new ChessPosition(Integer.parseInt(words[1].substring(1)), convertLetterToCol(words[1].charAt(0))));
         Collection<ChessPosition> ends = new HashSet<>();
         if (moves != null) {
             for (ChessMove move : moves) {
@@ -130,20 +129,20 @@ public class TerminalGamePlay {
 
     private void makeMove(String line) throws BadInputException, InvalidMoveException {
         String[] words = line.split(" ");
-        if (words.length != 5){
-            throw new BadInputException("invalid entry (hint: need space between row and col)");
+        if (words.length != 3){
+            throw new BadInputException("invalid entry");
         }
         try{
-            if(Integer.parseInt(words[2]) > 8 || Integer.parseInt(words[2]) < 1){
+            if(Integer.parseInt(words[1].substring(1)) > 8 || Integer.parseInt(words[1].substring(1)) < 1){
                 throw new BadInputException("invalid row input for start");
             }
-            if(Integer.parseInt(words[4]) > 8 || Integer.parseInt(words[4]) < 1){
+            if(Integer.parseInt(words[2].substring(1)) > 8 || Integer.parseInt(words[2].substring(1)) < 1){
                 throw new BadInputException("invalid row input for end");
             }
         } catch (NumberFormatException e1){
             throw new BadInputException("invalid row input");
         }
-        ChessMove move = new ChessMove(new ChessPosition(Integer.parseInt(words[2]), convertLetterToCol(words[1])), new ChessPosition(Integer.parseInt(words[4]), convertLetterToCol(words[3])), null);
+        ChessMove move = new ChessMove(new ChessPosition(Integer.parseInt(words[1].substring(1)), convertLetterToCol(words[1].charAt(0))), new ChessPosition(Integer.parseInt(words[2].substring(1)), convertLetterToCol(words[2].charAt(0))), null);
         try {
             ws.makeMove(move);
         } catch (Exception e1){
@@ -165,45 +164,26 @@ public class TerminalGamePlay {
         }
     }
 
-    private static void helpHelper(PrintStream out, String command, String[] arguments, String description){
-        out.print(SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE);
-        out.print(command);
-        out.print(RESET_TEXT_BOLD_FAINT);
-        for (String argument:arguments){
-            out.print(" <");
-            out.print(argument);
-            out.print(">");
-        }
-        out.print(": ");
-        out.print(SET_TEXT_COLOR_WHITE);
-        out.print(description);
-        out.println();
-    }
-
-    private int convertLetterToCol(String letter) throws BadInputException {
-        if (letter.equalsIgnoreCase("a")){
+    private int convertLetterToCol(char letter) throws BadInputException {
+        letter = Character.toLowerCase(letter);
+        if (letter == 'a'){
             return 1;
-        } else if (letter.equalsIgnoreCase("b")){
+        } else if (letter == 'b'){
             return 2;
-        } else if (letter.equalsIgnoreCase("c")){
+        } else if (letter == 'c'){
             return 3;
-        } else if (letter.equalsIgnoreCase("d")){
+        } else if (letter == 'd'){
             return 4;
-        } else if (letter.equalsIgnoreCase("e")){
+        } else if (letter == 'e'){
             return 5;
-        } else if (letter.equalsIgnoreCase("f")){
+        } else if (letter == 'f'){
             return 6;
-        } else if (letter.equalsIgnoreCase("g")){
+        } else if (letter == 'g'){
             return 7;
-        } else if (letter.equalsIgnoreCase("h")){
+        } else if (letter == 'h'){
             return 8;
         }
         throw new BadInputException("invalid col entry");
-    }
-
-    private static void errorDisplay(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
-        out.print(SET_TEXT_COLOR_WHITE);
     }
 
     private void printPrompt(PrintStream out){
