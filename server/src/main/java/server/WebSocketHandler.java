@@ -59,7 +59,7 @@ public class WebSocketHandler {
             }
 
         } catch (UnauthorizedException e1){
-            System.out.print("somehow sent websocket wo being signed in");
+            throwErrorMessage(session, "somehow send websocket without being signed in");
             return;
         }
 
@@ -97,7 +97,7 @@ public class WebSocketHandler {
             message = userService.getUsername(token) + " is now observing the game";
 
         } catch (UnauthorizedException e1){
-            System.out.print("somehow sent websocket wo being signed in");
+            throwErrorMessage(session, "somehow sent websocket without being signed in");
             return;
         }
         var notification = new Notification(message);
