@@ -76,14 +76,14 @@ public class GameService {
         return null;
     }
 
-    public ChessGame getGame(int gameID){
+    public ChessGame getGame(int gameID) throws DataAccessException {
         ArrayList<GameData> list = gameData.listGames();
         for (GameData data : list){
             if (data.gameID() == gameID){
                 return data.game();
             }
         }
-        return null;
+        throw new DataAccessException("game does not exist");
     }
 
     public void updateGame(int gameID, ChessGame newGame){

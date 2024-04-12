@@ -3,6 +3,7 @@ package server;
 import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import dataAccess.DataAccessException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -61,11 +62,27 @@ public class WebSocketHandler {
             System.out.print("somehow sent websocket wo being signed in");
             return;
         }
+
+        try{
+            gameService.getGame(req.getGameID());
+        } catch (DataAccessException e1){
+            throwErrorMessage(session, e1.getMessage());
+            return;
+        }
+
         var notification = new Notification(message);
         broadcast(req.getGameID(), new Gson().toJson(notification), session);
 
         connections.add(new SessionInfo(token, req.getGameID(), session));
-        var loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
+
+        LoadGame loadNotify;
+        try{
+            loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
+        } catch (DataAccessException e1){
+            throwErrorMessage(session, e1.getMessage());
+            return;
+        }
+
         try {
             session.getRemote().sendString(new Gson().toJson(loadNotify));
         } catch (IOException e1) {
@@ -88,7 +105,14 @@ public class WebSocketHandler {
 
         connections.add(new SessionInfo(token, req.getGameID(), session));
 
-        var loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
+        LoadGame loadNotify;
+        try {
+            loadNotify = new LoadGame(gameService.getGame(req.getGameID()));
+        } catch (DataAccessException e1){
+            throwErrorMessage(session, "game somehow disappeared");
+            return;
+        }
+
         try {
             session.getRemote().sendString(new Gson().toJson(loadNotify));
         } catch (IOException e1) {
@@ -107,53 +131,39 @@ public class WebSocketHandler {
                 try {
                     color = gameService.getPlayerColor(userService.getUsername(token), gameID);
                 } catch (UnauthorizedException e1){
-                    try {
-                        session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you do not have access to chess")));
-                        return;
-                    } catch (IOException e2){
-                        System.out.println("bad session l 108");
-                    }
+                    throwErrorMessage(session, "you do not have access to chess");
+                    return;
                 }
             }
         }
         if (gameID == -1){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("game does not exist 2")));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+            throwErrorMessage(session, "game does not exist");
+            return;
         }
 
         if (color == null){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you are not a player in this game")));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+            throwErrorMessage(session, "you are not a player in this game");
+            return;
         }
 
-        ChessGame game = gameService.getGame(gameID);
+        ChessGame game;
+        try {
+            game = gameService.getGame(gameID);
+        } catch (DataAccessException e1){
+            throwErrorMessage(session, "game somehow disappeared");
+            return;
+        }
 
         if (game.getBoard().getPiece(req.getMove().start()) != null && game.getBoard().getPiece(req.getMove().start()).getTeamColor() != color){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("that piece does not belong to you")));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+            throwErrorMessage(session, "that piece does not belong to you");
+            return;
         }
 
         try {
             game.makeMove(req.getMove());
         } catch (InvalidMoveException e1){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e1.getMessage())));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+            throwErrorMessage(session, e1.getMessage());
+            return;
         }
 
         gameService.updateGame(gameID, game);
@@ -176,12 +186,7 @@ public class WebSocketHandler {
             }
         }
         if (toRemove == null){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("somehow you were never here")));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+            throwErrorMessage(session, "somehow you were never here");
             return;
         }
         connections.remove(toRemove);
@@ -203,34 +208,28 @@ public class WebSocketHandler {
                 try {
                     color = gameService.getPlayerColor(userService.getUsername(token), gameID);
                 } catch (UnauthorizedException e1){
-                    try {
-                        session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you do not have access to chess")));
-                        return;
-                    } catch (IOException e2){
-                        System.out.println("bad session l 108");
-                    }
+                    throwErrorMessage(session, "you do not have access to chess");
+                    return;
                 }
             }
         }
-        if (gameID == -1){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("game does not exist 3")));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+        if (gameID != req.getGameID()){
+            throwErrorMessage(session, "game does not exist");
+            return;
         }
 
         if (color == null){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("you are not a player in this game")));
-                return;
-            } catch (IOException e2){
-                System.out.println("bad session l 108");
-            }
+            throwErrorMessage(session, "you are not a player in this game");
+            return;
         }
 
-        ChessGame game = gameService.getGame(gameID);
+        ChessGame game;
+        try {
+            game = gameService.getGame(gameID);
+        } catch (DataAccessException e1){
+            throwErrorMessage(session, "game somehow disappeared");
+            return;
+        }
 
         game.endGame();
 
@@ -244,15 +243,30 @@ public class WebSocketHandler {
 
     }
 
+    private void throwErrorMessage(Session session, String message){
+        try {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage(message)));
+        } catch (IOException e2){
+            System.out.println("bad session l 259");
+        }
+    }
+
     private void broadcast(int gameID, String notification, Session root) {
+        ArrayList<SessionInfo> toRemove = new ArrayList<>();
         for (SessionInfo session : connections){
-            if (session.gameID == gameID && !session.session.equals(root)) {
+            if (session.gameID == gameID && !session.session.equals(root) && session.session.isOpen()) {
                 try {
                     session.session.getRemote().sendString(notification);
                 } catch (IOException e1) {
                     System.out.print(e1.getMessage());
                 }
             }
+            if (!session.session.isOpen()){
+                toRemove.add(session);
+            }
+        }
+        for (SessionInfo info : toRemove){
+            connections.remove(info);
         }
     }
 
