@@ -52,6 +52,7 @@ public class ChessGame {
         blackLeftRookMoved = original.blackLeftRookMoved;
         blackRightRookMoved = original.blackRightRookMoved;
         lastMove = original.lastMove;
+        isOver = original.isOver;
     }
 
     /**
