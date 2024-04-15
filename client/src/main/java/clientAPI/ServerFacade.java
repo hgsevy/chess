@@ -102,7 +102,6 @@ public class ServerFacade {
         try {
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 authToken = "";
-                // Read response body from InputStream ...
             } else {
                 // SERVER RETURNED AN HTTP ERROR
                 InputStream responseBody = connection.getErrorStream();
@@ -131,16 +130,7 @@ public class ServerFacade {
             throw new BadInputException("can't connect to server: " + e1.getMessage());
         }
 
-        try {
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                // SERVER RETURNED AN HTTP ERROR
-                InputStream responseBody = connection.getErrorStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-            }
-        } catch (IOException e1){
-            throw new BadInputException(e1.getMessage());
-        }
+        checkForError(connection);
     }
 
     public ArrayList<GameData> list() throws BadInputException {
@@ -191,6 +181,16 @@ public class ServerFacade {
             throw new BadInputException("can't connect to server: " + e1.getMessage());
         }
 
+        checkForError(connection);
+
+        try {
+            return new WSClient(portNum, authToken, req.gameID(), notificationHandler);
+        } catch (Exception e1){
+            throw new BadInputException("couldn't websocket because " + e1.getMessage());
+        }
+    }
+
+    private void checkForError(HttpURLConnection connection) throws BadInputException {
         try {
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 // SERVER RETURNED AN HTTP ERROR
@@ -200,11 +200,6 @@ public class ServerFacade {
             }
         } catch (IOException e1){
             throw new BadInputException(e1.getMessage());
-        }
-        try {
-            return new WSClient(portNum, authToken, req.gameID(), notificationHandler);
-        } catch (Exception e1){
-            throw new BadInputException("couldn't websocket because " + e1.getMessage());
         }
     }
 
