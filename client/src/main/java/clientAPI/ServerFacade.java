@@ -45,20 +45,7 @@ public class ServerFacade {
             throw new BadInputException("can't connect to server: " + e1.getMessage());
         }
 
-        try {
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                InputStream responseBody = connection.getInputStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                authToken =  new Gson().fromJson(output, LoginResult.class).authToken();
-            } else {
-                // SERVER RETURNED AN HTTP ERROR
-                InputStream responseBody = connection.getErrorStream();
-                String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                throw new BadInputException(new Gson().fromJson(output, MessageResponse.class).message());
-            }
-        } catch (IOException e1){
-            throw new BadInputException("couldn't read JSON: " + e1.getMessage());
-        }
+        authToken = readAuthToken(connection);
     }
 
     public void login(String username, String password) throws BadInputException {
@@ -77,11 +64,15 @@ public class ServerFacade {
             throw new BadInputException("can't connect to server: " + e1.getMessage());
         }
 
+        authToken = readAuthToken(connection);
+    }
+
+    private String readAuthToken(HttpURLConnection connection) throws BadInputException {
         try {
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 InputStream responseBody = connection.getInputStream();
                 String output = new String(responseBody.readAllBytes(), StandardCharsets.UTF_8);
-                authToken = new Gson().fromJson(output, LoginResult.class).authToken();
+                return new Gson().fromJson(output, LoginResult.class).authToken();
             } else {
                 // SERVER RETURNED AN HTTP ERROR
                 InputStream responseBody = connection.getErrorStream();
