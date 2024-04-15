@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataAccess.DataAccessException;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -48,26 +49,41 @@ public class WebSocketHandler {
     }
 
     private void joinPlayer(String token, JoinPlayer req, Session session){
-        String message;
+        String username;
         try {
-            message = userService.getUsername(token) + " has now joined the game as ";
-            if (req.getColor() == ChessGame.TeamColor.BLACK){
-                message += "black";
-            }
-            else {
-                message += "white";
-            }
-
+            username = userService.getUsername(req.getAuthString());
         } catch (UnauthorizedException e1){
-            throwErrorMessage(session, "somehow send websocket without being signed in");
+            throwErrorMessage(session, "not authorized");
             return;
         }
 
+        // ensure player actually joined
         try{
-            gameService.getGame(req.getGameID());
-        } catch (DataAccessException e1){
-            throwErrorMessage(session, e1.getMessage());
+            ArrayList<GameData> games = gameService.list(req.getAuthString());
+            boolean exists = false;
+            for (GameData game : games){
+                if (game.gameID() == req.getGameID()){
+                    exists = true;
+                    if (req.getColor() == ChessGame.TeamColor.BLACK && !game.blackUsername().equals(username) || req.getColor() == ChessGame.TeamColor.WHITE && !game.whiteUsername().equals(username)){
+                        throwErrorMessage(session, "you did not actually join the game");
+                    }
+                    break;
+                }
+            }
+            if (!exists) {
+                throwErrorMessage(session, "game does not exist");
+                return;
+            }
+        } catch (UnauthorizedException e1){
+            throwErrorMessage(session, "you do not have access");
             return;
+        }
+
+        String message = username + " has now joined the game as ";
+        if (req.getColor() == ChessGame.TeamColor.BLACK) {
+            message += "black";
+        } else {
+            message += "white";
         }
 
         var notification = new Notification(message);
