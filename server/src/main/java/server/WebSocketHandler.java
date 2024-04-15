@@ -50,6 +50,7 @@ public class WebSocketHandler {
 
     private void joinPlayer(String token, JoinPlayer req, Session session){
         String username;
+        String color = "";
         try {
             username = userService.getUsername(req.getAuthString());
         } catch (UnauthorizedException e1){
@@ -64,7 +65,11 @@ public class WebSocketHandler {
             for (GameData game : games){
                 if (game.gameID() == req.getGameID()){
                     exists = true;
-                    if (req.getColor() == ChessGame.TeamColor.BLACK && !game.blackUsername().equals(username) || req.getColor() == ChessGame.TeamColor.WHITE && !game.whiteUsername().equals(username)){
+                    if ((req.getColor() == ChessGame.TeamColor.BLACK && game.blackUsername().equals(username))){
+                        color = "black";
+                    } else if ((req.getColor() == ChessGame.TeamColor.WHITE && game.whiteUsername().equals(username))){
+                        color = "white";
+                    } else{
                         throwErrorMessage(session, "you did not actually join the game");
                         return;
                     }
@@ -80,12 +85,7 @@ public class WebSocketHandler {
             return;
         }
 
-        String message = username + " has now joined the game as ";
-        if (req.getColor() == ChessGame.TeamColor.BLACK) {
-            message += "black";
-        } else {
-            message += "white";
-        }
+        String message = username + " has now joined the game as " + color;
 
         var notification = new Notification(message);
         broadcast(req.getGameID(), new Gson().toJson(notification), session);
