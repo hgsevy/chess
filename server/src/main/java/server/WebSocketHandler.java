@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
+import service.exceptions.NoCanDoException;
 import service.exceptions.UnauthorizedException;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGame;
@@ -138,56 +139,31 @@ public class WebSocketHandler {
     }
 
     private void makeMove(String token, MakeMove req, Session session){
-        ChessGame.TeamColor color = null;
-        int gameID = -1;
-
-        for(SessionInfo sessionInfo : connections){
-            if(sessionInfo.session.equals(session)){
-                gameID = sessionInfo.gameID;
-                try {
-                    color = gameService.getPlayerColor(userService.getUsername(token), gameID);
-                } catch (UnauthorizedException e1){
-                    throwErrorMessage(session, "you do not have access to chess");
-                    return;
-                }
-            }
-        }
-        if (gameID == -1){
-            throwErrorMessage(session, "game does not exist");
-            return;
-        }
-
-        if (color == null){
-            throwErrorMessage(session, "you are not a player in this game");
-            return;
-        }
-
-        ChessGame game;
+        InfoForNotification info;
         try {
-            game = gameService.getGame(gameID);
+            info = getInfoForNotification(token, req.getGameID(), session);
         } catch (DataAccessException e1){
-            throwErrorMessage(session, "game somehow disappeared");
             return;
         }
 
-        if (game.getBoard().getPiece(req.getMove().start()) != null && game.getBoard().getPiece(req.getMove().start()).getTeamColor() != color){
+        if (info.game.getBoard().getPiece(req.getMove().start()) != null && info.game.getBoard().getPiece(req.getMove().start()).getTeamColor() != info.color){
             throwErrorMessage(session, "that piece does not belong to you");
             return;
         }
 
         try {
-            game.makeMove(req.getMove());
+            info.game.makeMove(req.getMove());
         } catch (InvalidMoveException e1){
             throwErrorMessage(session, e1.getMessage());
             return;
         }
 
-        gameService.updateGame(gameID, game);
+        gameService.updateGame(info.gameID, info.game);
         try {
             var notification = new Notification(userService.getUsername(token) + " just moved from " + req.getMove().getStartPosition() + " to " + req.getMove().getEndPosition());
-            broadcast(gameID, new Gson().toJson(notification), session);
-            var gameNot = new LoadGame(game);
-            broadcast(gameID, new Gson().toJson(gameNot), null);
+            broadcast(info.gameID, new Gson().toJson(notification), session);
+            var gameNot = new LoadGame(info.game);
+            broadcast(info.gameID, new Gson().toJson(gameNot), null);
         } catch (UnauthorizedException e1){
             System.out.println("how the heck did I get this far unauthorized?? (line 166)");
         }
@@ -215,44 +191,19 @@ public class WebSocketHandler {
     }
 
     private void resign(String token, Resign req, Session session){
-        ChessGame.TeamColor color = null;
-        int gameID = -1;
-
-        for(SessionInfo sessionInfo : connections){
-            if(sessionInfo.session.equals(session)){
-                gameID = sessionInfo.gameID;
-                try {
-                    color = gameService.getPlayerColor(userService.getUsername(token), gameID);
-                } catch (UnauthorizedException e1){
-                    throwErrorMessage(session, "you do not have access to chess");
-                    return;
-                }
-            }
-        }
-        if (gameID != req.getGameID()){
-            throwErrorMessage(session, "game does not exist");
-            return;
-        }
-
-        if (color == null){
-            throwErrorMessage(session, "you are not a player in this game");
-            return;
-        }
-
-        ChessGame game;
+        InfoForNotification info;
         try {
-            game = gameService.getGame(gameID);
+            info = getInfoForNotification(token, req.getGameID(), session);
         } catch (DataAccessException e1){
-            throwErrorMessage(session, "game somehow disappeared");
             return;
         }
 
-        game.endGame();
+        info.game.endGame();
 
-        gameService.updateGame(gameID, game);
+        gameService.updateGame(info.gameID, info.game);
         try {
             var notification = new Notification(userService.getUsername(token) + " just resigned from this game. It is now over");
-            broadcast(gameID, new Gson().toJson(notification), null);
+            broadcast(info.gameID, new Gson().toJson(notification), null);
         } catch (UnauthorizedException e1){
             System.out.println("how the heck did I get this far unauthorized?? (line 166)");
         }
@@ -286,5 +237,31 @@ public class WebSocketHandler {
         }
     }
 
+    private record InfoForNotification(int gameID, ChessGame.TeamColor color, ChessGame game){ }
+
+    private InfoForNotification getInfoForNotification(String token, int gameID, Session session) throws DataAccessException {
+        InfoForNotification info = null;
+        for(SessionInfo sessionInfo : connections){
+            if(sessionInfo.session.equals(session)){
+                try {
+                    info = new InfoForNotification(sessionInfo.gameID, gameService.getPlayerColor(userService.getUsername(token), gameID), gameService.getGame(sessionInfo.gameID));
+                } catch (UnauthorizedException e1){
+                    throwErrorMessage(session, "you do not have access to chess");
+                    throw new DataAccessException("unauthorized. error message sent");
+                }
+            }
+        }
+        if (info == null) {
+            throwErrorMessage(session, "game does not exist");
+            throw new DataAccessException("game doesn't exist. error message sent");
+        }
+
+        if (info.color == null){
+            throwErrorMessage(session, "you are not a player in this game");
+            throw new DataAccessException("not a player. error message sent");
+        }
+
+        return info;
+    }
 
 }
