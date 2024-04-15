@@ -420,7 +420,10 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         Collection<ChessMove> moves = allValidTeamMoves(teamColor);
-        return moves.isEmpty() && isInCheck(teamColor);
+        if (moves.isEmpty() && isInCheck(teamColor)){
+            isOver = true;
+            return true;
+        } else {return false;}
     }
 
     /**

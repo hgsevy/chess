@@ -158,10 +158,27 @@ public class WebSocketHandler {
             return;
         }
 
+        Notification notification1 = null;
+        if (info.game.isInCheck(ChessGame.TeamColor.WHITE)){
+            notification1 = new Notification(gameService.getPlayer(info.gameID, false) + " is in check");
+        }
+        if (info.game.isInCheckmate(ChessGame.TeamColor.BLACK)){
+            notification1 = new Notification(gameService.getPlayer(info.gameID, true) + " is in check");
+        }
+        if (info.game.isInCheckmate(ChessGame.TeamColor.WHITE)){
+            notification1 = new Notification("game is over because " + gameService.getPlayer(info.gameID, false) + " is in checkmate");
+        }
+        if (info.game.isInCheckmate(ChessGame.TeamColor.BLACK)){
+            notification1 = new Notification("game is over because " + gameService.getPlayer(info.gameID, true) + " is in checkmate");
+        }
+
         gameService.updateGame(info.gameID, info.game);
         try {
-            var notification = new Notification(userService.getUsername(token) + " just moved from " + req.getMove().getStartPosition() + " to " + req.getMove().getEndPosition());
-            broadcast(info.gameID, new Gson().toJson(notification), session);
+            var notification2 = new Notification(userService.getUsername(token) + " just moved from " + req.getMove().getStartPosition() + " to " + req.getMove().getEndPosition());
+            broadcast(info.gameID, new Gson().toJson(notification2), session);
+            if (notification1 != null){
+                broadcast(info.gameID, new Gson().toJson(notification1), null);
+            }
             var gameNot = new LoadGame(info.game);
             broadcast(info.gameID, new Gson().toJson(gameNot), null);
         } catch (UnauthorizedException e1){

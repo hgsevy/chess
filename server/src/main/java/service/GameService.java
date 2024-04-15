@@ -76,6 +76,21 @@ public class GameService {
         return null;
     }
 
+    public String getPlayer(int gameID, boolean isBlack){
+        ArrayList<GameData> list = gameData.listGames();
+        for (GameData data : list){
+            if (data.gameID() == gameID){
+                if (isBlack){
+                    return data.blackUsername();
+                }
+                else {
+                    return data.whiteUsername();
+                }
+            }
+        }
+        return null;
+    }
+
     public ChessGame getGame(int gameID) throws DataAccessException {
         ArrayList<GameData> list = gameData.listGames();
         for (GameData data : list){
