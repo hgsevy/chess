@@ -66,6 +66,7 @@ public class WebSocketHandler {
                     exists = true;
                     if (req.getColor() == ChessGame.TeamColor.BLACK && !game.blackUsername().equals(username) || req.getColor() == ChessGame.TeamColor.WHITE && !game.whiteUsername().equals(username)){
                         throwErrorMessage(session, "you did not actually join the game");
+                        return;
                     }
                     break;
                 }
@@ -194,6 +195,11 @@ public class WebSocketHandler {
         try {
             info = getInfoForNotification(token, req.getGameID(), session);
         } catch (DataAccessException e1){
+            return;
+        }
+
+        if (info.game.isOver()){
+            throwErrorMessage(session, "game is already over");
             return;
         }
 
